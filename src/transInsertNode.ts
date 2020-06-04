@@ -10,8 +10,9 @@ export const transInsertNode = (
       return leftOp;
     }
 
-    // case 'remove_text': {
-    // }
+    case 'remove_text': {
+      return leftOp;
+    }
 
     case 'insert_node': {
       if (Path.equals(leftOp.path, rightOp.path) && side === 'left') {

@@ -27,6 +27,7 @@ export const transRemoveText = (
         text: leftText + rightOp.text + rightText,
       };
     }
+
     case 'remove_text': {
       if (!Path.equals(leftOp.path, rightOp.path)) {
         return leftOp;
@@ -52,6 +53,13 @@ export const transRemoveText = (
         ...leftOp,
         offset: Math.min(leftOp.offset, rightOp.offset),
         text: leftText + rightText,
+      };
+    }
+
+    case 'insert_node': {
+      return {
+        ...leftOp,
+        path: <Path>Path.transform(leftOp.path, rightOp),
       };
     }
 
