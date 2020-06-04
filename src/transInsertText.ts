@@ -7,7 +7,7 @@ export const transInsertText = (
 ): InsertTextOperation => {
   switch (rightOp.type) {
     case 'insert_text': {
-      if (Path.compare(leftOp.path, rightOp.path)) {
+      if (!Path.equals(leftOp.path, rightOp.path)) {
         return leftOp;
       }
       if (leftOp.offset < rightOp.offset) {
@@ -23,7 +23,7 @@ export const transInsertText = (
     }
 
     case 'remove_text': {
-      if (Path.compare(leftOp.path, rightOp.path)) {
+      if (!Path.equals(leftOp.path, rightOp.path)) {
         return leftOp;
       }
       if (leftOp.offset <= rightOp.offset) {

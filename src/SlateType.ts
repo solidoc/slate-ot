@@ -70,6 +70,8 @@ const doTransform = (
       return OT.transInsertText(leftOp, rightOp, side);
     case 'remove_text':
       return OT.transRemoveText(leftOp, rightOp, side);
+    case 'insert_node':
+      return OT.transInsertNode(leftOp, rightOp, side);
     default:
       throw new Error('Unsupported OP');
   }
