@@ -1,23 +1,18 @@
-import { InsertNodeOperation, Operation, Path } from 'slate';
+import { RemoveNodeOperation, Operation, Path } from 'slate';
 
-export const transInsertNode = (
-  leftOp: InsertNodeOperation,
+export const transRemoveNode = (
+  leftOp: RemoveNodeOperation,
   rightOp: Operation,
-  side: 'left' | 'right'
-): InsertNodeOperation | null => {
+  _side: 'left' | 'right'
+): RemoveNodeOperation | null => {
   switch (rightOp.type) {
-    case 'insert_text': {
-      return leftOp;
-    }
+    // case 'insert_text': {
+    // }
 
-    case 'remove_text': {
-      return leftOp;
-    }
+    // case 'remove_text': {
+    // }
 
     case 'insert_node': {
-      if (Path.equals(leftOp.path, rightOp.path) && side === 'left') {
-        return leftOp;
-      }
       return {
         ...leftOp,
         path: <Path>Path.transform(leftOp.path, rightOp),

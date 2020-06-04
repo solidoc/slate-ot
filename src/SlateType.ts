@@ -28,9 +28,9 @@ const slateType = {
     op1 = slateType.normalize(op1);
 
     for (let i = 0; i < op1.length; i++) {
-      let leftOp = op1[i];
+      let leftOp: Operation | null = op1[i];
 
-      for (let j = 0; j < op0.length; j++) {
+      for (let j = 0; j < op0.length && leftOp; j++) {
         const rightOp = op0[j];
         leftOp = doTransform(leftOp, rightOp, side);
 
@@ -39,9 +39,10 @@ const slateType = {
         //   break;
         // }
       }
-      result = Array.isArray(leftOp)
-        ? [...result, ...leftOp]
-        : [...result, leftOp];
+      leftOp && result.push(leftOp);
+      // result = Array.isArray(leftOp)
+      //   ? [...result, ...leftOp]
+      //   : [...result, leftOp];
     }
     return result;
   },
@@ -63,7 +64,7 @@ const doTransform = (
   leftOp: Operation,
   rightOp: Operation,
   side: 'left' | 'right'
-) => {
+): Operation | null => {
   // return side === 'left' ? leftOp : rightOp;
   switch (leftOp.type) {
     case 'insert_text':

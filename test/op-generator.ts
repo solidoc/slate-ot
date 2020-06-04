@@ -23,15 +23,31 @@ export const getAllTextPaths = (node: Node, path: Path = []): Path[] => {
   return array;
 };
 
-/**
- * Start from document
- * @param {Value} snapshot
- * @param {Array} leafs
- */
-export const getRandomNodePath = (root: Node): Path => {
+export const getRandomPathFrom = (root: Node): Path => {
   const path: Path = [];
   // let currentNode = root;
-  while (path.length === 0 || fuzzer.randomInt(3) > 0) {
+  while (1) {
+    // stop when you get to a leaf
+    if (Text.isText(root)) {
+      return path;
+    }
+
+    if (root.children.length === 0 || fuzzer.randomInt(3) === 0) {
+      return [];
+    }
+
+    // continue
+    const index = <number>fuzzer.randomInt(root.children.length);
+    path.push(index);
+    root = root.children[index];
+  }
+  return path;
+};
+
+export const getRandomPathTo = (root: Node): Path => {
+  const path: Path = [];
+  // let currentNode = root;
+  while (1) {
     // stop when you get to a leaf
     if (Text.isText(root)) {
       return path;
@@ -91,9 +107,12 @@ export const getRandomNodePath = (root: Node): Path => {
  */
 export const generateAndApplyRandomOp = function (snapshot) {
   // const value = slateType.create(snapshot);
-  let index = fuzzer.randomInt(AVAILIBLE_OPS_LEN);
-  let op: Operation = genRandOp[index](snapshot);
+  let op: Operation | null = null;
   const result = _.cloneDeep(snapshot);
+  while (!op) {
+    let index = fuzzer.randomInt(AVAILIBLE_OPS_LEN);
+    op = genRandOp[index](snapshot);
+  }
   Transforms.transform(result, op);
   return [[op], result];
 };
@@ -154,7 +173,7 @@ export const generateRandomNode = (): Node => {
 
 // insert_node: ['path', 'node', 'data']
 export const generateRandomInsertNodeOp = (snapshot): Operation => {
-  const randomPath = getRandomNodePath(snapshot);
+  const randomPath = getRandomPathTo(snapshot);
 
   return {
     type: 'insert_node',
@@ -163,24 +182,29 @@ export const generateRandomInsertNodeOp = (snapshot): Operation => {
   };
 };
 
-// export const generateRandomRemoveNodeOp = (snapshot) => {
-//   const randomPath = getRandomNodePath(snapshot.document);
+export const generateRandomRemoveNodeOp = (snapshot): Operation | null => {
+  const randomPath = getRandomPathFrom(snapshot);
 
-//   const op = Operation.create({
-//     object: 'operation',
-//     type: 'remove_node',
-//     path: randomPath,
-//     data: {},
-//   });
+  return randomPath.length === 0
+    ? {
+        type: 'remove_node',
+        path: randomPath,
+        node: Node.get(snapshot, randomPath),
+      }
+    : null;
+};
 
-//   return op;
-// };
-
-const AVAILIBLE_OPS = ['insert_text', 'remove_text', 'insert_node'];
+const AVAILIBLE_OPS = [
+  // 'insert_text',
+  // 'remove_text',
+  'insert_node',
+  'remove_node',
+];
 const AVAILIBLE_OPS_LEN = AVAILIBLE_OPS.length;
 
 const genRandOp = [
-  generateRandomInsertTextOp,
-  generateRandomRemoveTextOp,
+  // generateRandomInsertTextOp,
+  // generateRandomRemoveTextOp,
   generateRandomInsertNodeOp,
+  generateRandomRemoveNodeOp,
 ];
