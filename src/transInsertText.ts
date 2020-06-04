@@ -42,6 +42,13 @@ export const transInsertText = (
       };
     }
 
+    case 'insert_node': {
+      return {
+        ...leftOp,
+        path: <Path>Path.transform(leftOp.path, rightOp),
+      };
+    }
+
     default:
       throw new Error('Unsupported OP');
   }

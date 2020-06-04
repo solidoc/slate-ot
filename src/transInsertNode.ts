@@ -6,8 +6,9 @@ export const transInsertNode = (
   side: 'left' | 'right'
 ): InsertNodeOperation => {
   switch (rightOp.type) {
-    // case 'insert_text': {
-    // }
+    case 'insert_text': {
+      return leftOp;
+    }
 
     // case 'remove_text': {
     // }

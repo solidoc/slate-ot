@@ -177,11 +177,11 @@ export const generateRandomInsertNodeOp = (snapshot): Operation => {
 // };
 
 // const AVAILIBLE_OPS = ['insert_text', 'remove_text', 'insert_node'];
-const AVAILIBLE_OPS = ['insert_node'];
+const AVAILIBLE_OPS = ['insert_text', 'insert_node'];
 const AVAILIBLE_OPS_LEN = AVAILIBLE_OPS.length;
 
 const genRandOp = [
-  // generateRandomInsertTextOp,
+  generateRandomInsertTextOp,
   // generateRandomRemoveTextOp,
   generateRandomInsertNodeOp,
 ];
