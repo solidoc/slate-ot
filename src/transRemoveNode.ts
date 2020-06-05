@@ -6,11 +6,13 @@ export const transRemoveNode = (
   _side: 'left' | 'right'
 ): RemoveNodeOperation | null => {
   switch (rightOp.type) {
-    // case 'insert_text': {
-    // }
+    case 'insert_text': {
+      return leftOp;
+    }
 
-    // case 'remove_text': {
-    // }
+    case 'remove_text': {
+      return leftOp;
+    }
 
     case 'insert_node': {
       return {

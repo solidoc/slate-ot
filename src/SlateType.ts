@@ -23,7 +23,7 @@ const slateType = {
     op1: Operation[] | Operation,
     op0: Operation[],
     side: 'left' | 'right'
-  ) {
+  ): Operation[] {
     let result: Operation[] = [];
     op1 = slateType.normalize(op1);
 
@@ -73,6 +73,8 @@ const doTransform = (
       return OT.transRemoveText(leftOp, rightOp, side);
     case 'insert_node':
       return OT.transInsertNode(leftOp, rightOp, side);
+    case 'remove_node':
+      return OT.transRemoveNode(leftOp, rightOp, side);
     default:
       throw new Error('Unsupported OP');
   }

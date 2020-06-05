@@ -4,7 +4,7 @@ export const transRemoveText = (
   leftOp: RemoveTextOperation,
   rightOp: Operation,
   _side: 'left' | 'right'
-): RemoveTextOperation => {
+): RemoveTextOperation | null => {
   switch (rightOp.type) {
     case 'insert_text': {
       if (!Path.equals(leftOp.path, rightOp.path)) {
@@ -63,6 +63,15 @@ export const transRemoveText = (
       };
     }
 
+    case 'remove_node': {
+      const path: Path | null = Path.transform(leftOp.path, rightOp);
+      return path
+        ? {
+            ...leftOp,
+            path,
+          }
+        : null;
+    }
     default:
       throw new Error('Unsupported OP');
   }

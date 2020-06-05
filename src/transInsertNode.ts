@@ -25,7 +25,10 @@ export const transInsertNode = (
     }
 
     case 'remove_node': {
-      const path: Path | null = Path.transform(leftOp.path, rightOp);
+      // seems to be a bug in slate's Path.transform()
+      const path: Path | null = Path.equals(leftOp.path, rightOp.path)
+        ? leftOp.path
+        : Path.transform(leftOp.path, rightOp);
       return path
         ? {
             ...leftOp,
