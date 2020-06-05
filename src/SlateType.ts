@@ -20,7 +20,7 @@ const slateType = {
   },
 
   transform(
-    op1: Operation[] | Operation,
+    op1: Operation[],
     op0: Operation[],
     side: 'left' | 'right'
   ): Operation[] {
@@ -29,20 +29,16 @@ const slateType = {
 
     for (let i = 0; i < op1.length; i++) {
       let leftOp: Operation | null = op1[i];
+      let rightOp: Operation | null;
 
+      let op0t: Operation[] = [];
       for (let j = 0; j < op0.length && leftOp; j++) {
-        const rightOp = op0[j];
-        leftOp = doTransform(leftOp, rightOp, side);
+        [leftOp, rightOp] = xTransform(leftOp, op0[j], side);
 
-        // if (Array.isArray(leftOp) && leftOp.length > 1) {
-        //   leftOp = slateType.transform(leftOp, op0.slice(j), side);
-        //   break;
-        // }
+        rightOp && op0t.push(rightOp);
       }
       leftOp && result.push(leftOp);
-      // result = Array.isArray(leftOp)
-      //   ? [...result, ...leftOp]
-      //   : [...result, leftOp];
+      op0 = op0t;
     }
     return result;
   },
@@ -60,6 +56,17 @@ const slateType = {
   },
 };
 
+const xTransform = (
+  leftOp: Operation,
+  rightOp: Operation,
+  side: 'left' | 'right'
+): [Operation | null, Operation | null] => {
+  const other = side === 'left' ? 'right' : 'left';
+  return [
+    doTransform(leftOp, rightOp, side),
+    doTransform(rightOp, leftOp, other),
+  ];
+};
 const doTransform = (
   leftOp: Operation,
   rightOp: Operation,
