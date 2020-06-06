@@ -189,9 +189,29 @@ export const generateRandomRemoveNodeOp = (snapshot): Operation | null => {
     : null;
 };
 
+export const generateRandomSplitNodeOp = (snapshot): Operation | null => {
+  const randomPath = getRandomPathFrom(snapshot);
+
+  const node = Node.get(snapshot, randomPath);
+  const position = Text.isText(node)
+    ? <number>fuzzer.randomInt(node.text.length + 1)
+    : <number>fuzzer.randomInt(node.children.length + 1);
+
+  return randomPath.length
+    ? {
+        type: 'split_node',
+        path: randomPath,
+        position,
+        target: null,
+        properties: {},
+      }
+    : null;
+};
+
 const genRandOp = [
-  generateRandomInsertTextOp,
-  generateRandomRemoveTextOp,
-  generateRandomInsertNodeOp,
-  generateRandomRemoveNodeOp,
+  // generateRandomInsertTextOp,
+  // generateRandomRemoveTextOp,
+  // generateRandomInsertNodeOp,
+  // generateRandomRemoveNodeOp,
+  generateRandomSplitNodeOp,
 ];

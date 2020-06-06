@@ -82,6 +82,8 @@ const doTransform = (
       return OT.transInsertNode(leftOp, rightOp, side);
     case 'remove_node':
       return OT.transRemoveNode(leftOp, rightOp, side);
+    case 'split_node':
+      return OT.transSplitNode(leftOp, rightOp, side);
     default:
       throw new Error('Unsupported OP');
   }
