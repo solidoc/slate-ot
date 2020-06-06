@@ -15,35 +15,43 @@ export const transSplitNode = (
     // }
 
     case 'insert_node': {
-      if (!Path.isParent(leftOp.path, rightOp.path)) {
+      if (Path.isParent(leftOp.path, rightOp.path)) {
+        let offset = rightOp.path[rightOp.path.length - 1];
+
         return {
           ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
+          position:
+            leftOp.position < offset ? leftOp.position : leftOp.position + 1,
         };
-      }
-      let offset = rightOp.path[rightOp.path.length - 1];
-      if (leftOp.position < offset) {
-        return leftOp;
       }
 
       return {
         ...leftOp,
-        position: leftOp.position + 1,
+        path: Path.transform(leftOp.path, rightOp)!,
       };
     }
 
-    // case 'remove_node': {
-    //   // seems to be a bug in slate's Path.transform()
-    //   const path: Path | null = Path.equals(leftOp.path, rightOp.path)
-    //     ? leftOp.path
-    //     : Path.transform(leftOp.path, rightOp);
-    //   return path
-    //     ? {
-    //         ...leftOp,
-    //         path,
-    //       }
-    //     : null;
-    // }
+    case 'remove_node': {
+      if (Path.isParent(leftOp.path, rightOp.path)) {
+        let offset = rightOp.path[rightOp.path.length - 1];
+        if (leftOp.position < offset) {
+          return leftOp;
+        }
+
+        return {
+          ...leftOp,
+          position: leftOp.position - 1,
+        };
+      }
+
+      const path: Path | null = Path.transform(leftOp.path, rightOp);
+      return path
+        ? {
+            ...leftOp,
+            path,
+          }
+        : null;
+    }
 
     case 'split_node': {
       if (!Path.equals(leftOp.path, rightOp.path)) {

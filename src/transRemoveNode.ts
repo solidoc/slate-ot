@@ -31,6 +31,13 @@ export const transRemoveNode = (
         : null;
     }
 
+    case 'split_node': {
+      return {
+        ...leftOp,
+        path: Path.transform(leftOp.path, rightOp)!,
+      };
+    }
+
     default:
       throw new Error('Unsupported OP');
   }
