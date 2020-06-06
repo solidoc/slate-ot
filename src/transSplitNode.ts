@@ -14,15 +14,23 @@ export const transSplitNode = (
     //   return leftOp;
     // }
 
-    // case 'insert_node': {
-    //   if (Path.equals(leftOp.path, rightOp.path) && side === 'left') {
-    //     return leftOp;
-    //   }
-    //   return {
-    //     ...leftOp,
-    //     path: <Path>Path.transform(leftOp.path, rightOp),
-    //   };
-    // }
+    case 'insert_node': {
+      if (!Path.isParent(leftOp.path, rightOp.path)) {
+        return {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        };
+      }
+      let offset = rightOp.path[rightOp.path.length - 1];
+      if (leftOp.position < offset) {
+        return leftOp;
+      }
+
+      return {
+        ...leftOp,
+        position: leftOp.position + 1,
+      };
+    }
 
     // case 'remove_node': {
     //   // seems to be a bug in slate's Path.transform()

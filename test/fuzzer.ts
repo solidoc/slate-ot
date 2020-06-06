@@ -10,7 +10,7 @@ const testDoc: Element = {
   children: [
     {
       type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }, { text: 'Test' }],
+      children: [{ text: 'ABCDEF' }, { text: 'Test' }],
       // children: [{ text: 'A quick brown fox jumps over the lazy dog.' }],
     },
   ],

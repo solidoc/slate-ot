@@ -20,7 +20,7 @@ export const transInsertNode = (
       }
       return {
         ...leftOp,
-        path: <Path>Path.transform(leftOp.path, rightOp),
+        path: Path.transform(leftOp.path, rightOp)!,
       };
     }
 
@@ -29,12 +29,23 @@ export const transInsertNode = (
       const path: Path | null = Path.equals(leftOp.path, rightOp.path)
         ? leftOp.path
         : Path.transform(leftOp.path, rightOp);
+
       return path
         ? {
             ...leftOp,
             path,
           }
         : null;
+    }
+
+    case 'split_node': {
+      if (Path.equals(leftOp.path, rightOp.path)) {
+        return leftOp;
+      }
+      return {
+        ...leftOp,
+        path: Path.transform(leftOp.path, rightOp)!,
+      };
     }
 
     default:

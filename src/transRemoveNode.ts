@@ -17,7 +17,7 @@ export const transRemoveNode = (
     case 'insert_node': {
       return {
         ...leftOp,
-        path: <Path>Path.transform(leftOp.path, rightOp),
+        path: Path.transform(leftOp.path, rightOp)!,
       };
     }
 

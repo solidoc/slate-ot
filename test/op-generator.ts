@@ -211,7 +211,7 @@ export const generateRandomSplitNodeOp = (snapshot): Operation | null => {
 const genRandOp = [
   // generateRandomInsertTextOp,
   // generateRandomRemoveTextOp,
-  // generateRandomInsertNodeOp,
+  generateRandomInsertNodeOp,
   // generateRandomRemoveNodeOp,
   generateRandomSplitNodeOp,
 ];
