@@ -58,6 +58,26 @@ export const transInsertText = (
           }
         : null;
     }
+
+    case 'split_node': {
+      if (!Path.equals(leftOp.path, rightOp.path)) {
+        return {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        };
+      }
+
+      if (leftOp.offset <= rightOp.position) {
+        return leftOp;
+      }
+
+      return {
+        ...leftOp,
+        path: Path.next(leftOp.path),
+        offset: leftOp.offset - rightOp.position,
+      };
+    }
+
     default:
       throw new Error('Unsupported OP');
   }

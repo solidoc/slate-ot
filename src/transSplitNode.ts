@@ -6,13 +6,24 @@ export const transSplitNode = (
   _side: 'left' | 'right'
 ): SplitNodeOperation | null => {
   switch (rightOp.type) {
-    // case 'insert_text': {
-    //   return leftOp;
-    // }
+    case 'insert_text': {
+      if (!Path.equals(leftOp.path, rightOp.path)) {
+        return leftOp;
+      }
 
-    // case 'remove_text': {
-    //   return leftOp;
-    // }
+      if (leftOp.position < rightOp.offset) {
+        return leftOp;
+      }
+
+      return {
+        ...leftOp,
+        position: leftOp.position + rightOp.text.length,
+      };
+    }
+
+    case 'remove_text': {
+      return leftOp;
+    }
 
     case 'insert_node': {
       if (Path.isParent(leftOp.path, rightOp.path)) {
