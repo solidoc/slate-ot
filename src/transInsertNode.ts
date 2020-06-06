@@ -4,24 +4,26 @@ export const transInsertNode = (
   leftOp: InsertNodeOperation,
   rightOp: Operation,
   side: 'left' | 'right'
-): InsertNodeOperation | null => {
+): InsertNodeOperation[] => {
   switch (rightOp.type) {
     case 'insert_text': {
-      return leftOp;
+      return [leftOp];
     }
 
     case 'remove_text': {
-      return leftOp;
+      return [leftOp];
     }
 
     case 'insert_node': {
       if (Path.equals(leftOp.path, rightOp.path) && side === 'left') {
-        return leftOp;
+        return [leftOp];
       }
-      return {
-        ...leftOp,
-        path: Path.transform(leftOp.path, rightOp)!,
-      };
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        },
+      ];
     }
 
     case 'remove_node': {
@@ -31,21 +33,25 @@ export const transInsertNode = (
         : Path.transform(leftOp.path, rightOp);
 
       return path
-        ? {
-            ...leftOp,
-            path,
-          }
-        : null;
+        ? [
+            {
+              ...leftOp,
+              path,
+            },
+          ]
+        : [];
     }
 
     case 'split_node': {
       if (Path.equals(leftOp.path, rightOp.path)) {
-        return leftOp;
+        return [leftOp];
       }
-      return {
-        ...leftOp,
-        path: Path.transform(leftOp.path, rightOp)!,
-      };
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        },
+      ];
     }
 
     default:

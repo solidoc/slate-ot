@@ -4,78 +4,92 @@ export const transInsertText = (
   leftOp: InsertTextOperation,
   rightOp: Operation,
   side: 'left' | 'right'
-): InsertTextOperation | null => {
+): InsertTextOperation[] => {
   switch (rightOp.type) {
     case 'insert_text': {
       if (!Path.equals(leftOp.path, rightOp.path)) {
-        return leftOp;
+        return [leftOp];
       }
+
       if (leftOp.offset < rightOp.offset) {
-        return leftOp;
+        return [leftOp];
       }
+
       if (leftOp.offset === rightOp.offset && side === 'left') {
-        return leftOp;
+        return [leftOp];
       }
-      return {
-        ...leftOp,
-        offset: leftOp.offset + rightOp.text.length,
-      };
+
+      return [
+        {
+          ...leftOp,
+          offset: leftOp.offset + rightOp.text.length,
+        },
+      ];
     }
 
     case 'remove_text': {
       if (!Path.equals(leftOp.path, rightOp.path)) {
-        return leftOp;
+        return [leftOp];
       }
+
       if (leftOp.offset <= rightOp.offset) {
-        return leftOp;
+        return [leftOp];
       }
+
       if (rightOp.offset + rightOp.text.length <= leftOp.offset) {
-        return {
-          ...leftOp,
-          offset: leftOp.offset - rightOp.text.length,
-        };
+        return [
+          {
+            ...leftOp,
+            offset: leftOp.offset - rightOp.text.length,
+          },
+        ];
       }
-      return {
-        ...leftOp,
-        offset: rightOp.offset,
-        text: '',
-      };
+
+      return [];
     }
 
     case 'insert_node': {
-      return {
-        ...leftOp,
-        path: Path.transform(leftOp.path, rightOp)!,
-      };
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        },
+      ];
     }
 
     case 'remove_node': {
       const path: Path | null = Path.transform(leftOp.path, rightOp);
       return path
-        ? {
-            ...leftOp,
-            path,
-          }
-        : null;
+        ? [
+            {
+              ...leftOp,
+              path,
+            },
+          ]
+        : [];
     }
 
     case 'split_node': {
       if (!Path.equals(leftOp.path, rightOp.path)) {
-        return {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        };
+        return [
+          {
+            ...leftOp,
+            path: Path.transform(leftOp.path, rightOp)!,
+          },
+        ];
       }
 
       if (leftOp.offset <= rightOp.position) {
-        return leftOp;
+        return [leftOp];
       }
 
-      return {
-        ...leftOp,
-        path: Path.next(leftOp.path),
-        offset: leftOp.offset - rightOp.position,
-      };
+      return [
+        {
+          ...leftOp,
+          path: Path.next(leftOp.path),
+          offset: leftOp.offset - rightOp.position,
+        },
+      ];
     }
 
     default:

@@ -20,27 +20,12 @@ const slateType = {
   },
 
   transform(
-    op1: Operation[],
-    op0: Operation[],
+    leftOps: Operation[],
+    rightOps: Operation[],
     side: 'left' | 'right'
   ): Operation[] {
-    let result: Operation[] = [];
-    op1 = slateType.normalize(op1);
-
-    for (let i = 0; i < op1.length; i++) {
-      let leftOp: Operation | null = op1[i];
-      let rightOp: Operation | null;
-
-      let op0t: Operation[] = [];
-      for (let j = 0; j < op0.length && leftOp; j++) {
-        [leftOp, rightOp] = xTransform(leftOp, op0[j], side);
-
-        rightOp && op0t.push(rightOp);
-      }
-      leftOp && result.push(leftOp);
-      op0 = op0t;
-    }
-    return result;
+    let [leftRes] = xTransformMxN(leftOps, rightOps, side);
+    return leftRes;
   },
 
   serialize(snapshot) {
@@ -56,22 +41,74 @@ const slateType = {
   },
 };
 
-const xTransform = (
+const xTransformMxN = (
+  leftOps: Operation[],
+  rightOps: Operation[],
+  side: 'left' | 'right'
+): [Operation[], Operation[]] => {
+  let leftRes: Operation[] = [];
+  let rightRes: Operation[] = [];
+
+  for (let m = 0; m < leftOps.length; m++) {
+    let leftOp: Operation = leftOps[m];
+
+    let [lRes, rRes] = xTransform1xN(leftOp, rightOps, side);
+
+    leftRes = leftRes.concat(lRes);
+
+    rightOps = rRes;
+  }
+
+  return [leftRes, rightRes];
+};
+
+const xTransform1xN = (
+  leftOp: Operation,
+  rightOps: Operation[],
+  side: 'left' | 'right'
+): [Operation[], Operation[]] => {
+  let rRes: Operation[] = [];
+
+  for (let n = 0; n < rightOps.length; n++) {
+    let rightOp: Operation = rightOps[n];
+
+    let [l, r] = xTransform1x1(leftOp, rightOp, side);
+
+    if (l.length === 0) {
+      rRes = rRes.concat(rightOps.slice(n + 1));
+      return [[], rRes];
+    }
+
+    if (l.length > 1) {
+      [l, r] = xTransformMxN(l, rightOps.slice(n + 1), side);
+      rRes = rRes.concat(r);
+      return [l, rRes];
+    }
+
+    // l.length == 1
+    rRes = rRes.concat(r);
+    leftOp = l[0];
+  }
+  return [[leftOp], rRes];
+};
+
+const xTransform1x1 = (
   leftOp: Operation,
   rightOp: Operation,
   side: 'left' | 'right'
-): [Operation | null, Operation | null] => {
+): [Operation[], Operation[]] => {
   const other = side === 'left' ? 'right' : 'left';
   return [
     doTransform(leftOp, rightOp, side),
     doTransform(rightOp, leftOp, other),
   ];
 };
+
 const doTransform = (
   leftOp: Operation,
   rightOp: Operation,
   side: 'left' | 'right'
-): Operation | null => {
+): Operation[] => {
   // return side === 'left' ? leftOp : rightOp;
   switch (leftOp.type) {
     case 'insert_text':

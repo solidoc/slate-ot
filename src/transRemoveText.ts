@@ -4,43 +4,53 @@ export const transRemoveText = (
   leftOp: RemoveTextOperation,
   rightOp: Operation,
   _side: 'left' | 'right'
-): RemoveTextOperation | null => {
+): RemoveTextOperation[] => {
   switch (rightOp.type) {
     case 'insert_text': {
       if (!Path.equals(leftOp.path, rightOp.path)) {
-        return leftOp;
+        return [leftOp];
       }
+
       if (leftOp.offset + leftOp.text.length <= rightOp.offset) {
-        return leftOp;
+        return [leftOp];
       }
+
       if (rightOp.offset <= leftOp.offset) {
-        return {
-          ...leftOp,
-          offset: leftOp.offset + rightOp.text.length,
-        };
+        return [
+          {
+            ...leftOp,
+            offset: leftOp.offset + rightOp.text.length,
+          },
+        ];
       }
+
       const intersectingIndex = rightOp.offset - leftOp.offset;
       const leftText = leftOp.text.slice(0, intersectingIndex);
       const rightText = leftOp.text.slice(intersectingIndex);
-      return {
-        ...leftOp,
-        text: leftText + rightOp.text + rightText,
-      };
+      return [
+        {
+          ...leftOp,
+          text: leftText + rightOp.text + rightText,
+        },
+      ];
     }
 
     case 'remove_text': {
       if (!Path.equals(leftOp.path, rightOp.path)) {
-        return leftOp;
+        return [leftOp];
       }
       if (leftOp.offset + leftOp.text.length <= rightOp.offset) {
-        return leftOp;
+        return [leftOp];
       }
       if (rightOp.offset + rightOp.text.length <= leftOp.offset) {
-        return {
-          ...leftOp,
-          offset: leftOp.offset - rightOp.text.length,
-        };
+        return [
+          {
+            ...leftOp,
+            offset: leftOp.offset - rightOp.text.length,
+          },
+        ];
       }
+
       // leftText and rightText both come from leftOp
       const leftTextEnd = Math.max(rightOp.offset - leftOp.offset, 0);
       const leftText = leftOp.text.slice(0, leftTextEnd);
@@ -49,29 +59,36 @@ export const transRemoveText = (
         rightOp.offset + rightOp.text.length - leftOp.offset
       );
       const rightText = leftOp.text.slice(rightTextStart);
-      return {
-        ...leftOp,
-        offset: Math.min(leftOp.offset, rightOp.offset),
-        text: leftText + rightText,
-      };
+      return [
+        {
+          ...leftOp,
+          offset: Math.min(leftOp.offset, rightOp.offset),
+          text: leftText + rightText,
+        },
+      ];
     }
 
     case 'insert_node': {
-      return {
-        ...leftOp,
-        path: Path.transform(leftOp.path, rightOp)!,
-      };
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        },
+      ];
     }
 
     case 'remove_node': {
       const path: Path | null = Path.transform(leftOp.path, rightOp);
       return path
-        ? {
-            ...leftOp,
-            path,
-          }
-        : null;
+        ? [
+            {
+              ...leftOp,
+              path,
+            },
+          ]
+        : [];
     }
+
     default:
       throw new Error('Unsupported OP');
   }

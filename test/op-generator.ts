@@ -118,7 +118,7 @@ export const getRandomPathTo = (root: Node): Path => {
 export const generateRandomNode = (): Node => {
   return {
     type: BLOCKS[fuzzer.randomInt(BLOCKS.length)],
-    children: [{ text: fuzzer.randomWord() }],
+    children: [{ text: fuzzer.randomWord() }, { text: fuzzer.randomWord() }],
   };
 };
 
@@ -210,8 +210,8 @@ export const generateRandomSplitNodeOp = (snapshot): Operation | null => {
 
 const genRandOp = [
   generateRandomInsertTextOp,
-  // generateRandomRemoveTextOp,
+  generateRandomRemoveTextOp,
   generateRandomInsertNodeOp,
-  // generateRandomRemoveNodeOp,
-  generateRandomSplitNodeOp,
+  generateRandomRemoveNodeOp,
+  // generateRandomSplitNodeOp,
 ];
