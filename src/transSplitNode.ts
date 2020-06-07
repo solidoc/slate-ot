@@ -106,8 +106,12 @@ export const transSplitNode = (
         ];
       }
 
-      if (leftOp.position <= rightOp.position) {
+      if (leftOp.position < rightOp.position) {
         return [leftOp];
+      }
+
+      if (leftOp.position === rightOp.position) {
+        return [];
       }
 
       return [

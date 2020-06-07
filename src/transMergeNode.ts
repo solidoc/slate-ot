@@ -1,4 +1,4 @@
-import { MergeNodeOperation, Operation, Path } from 'slate';
+import { MergeNodeOperation, Operation, Path, Text } from 'slate';
 
 export const transMergeNode = (
   leftOp: MergeNodeOperation,
@@ -6,14 +6,44 @@ export const transMergeNode = (
   _side: 'left' | 'right'
 ): MergeNodeOperation[] => {
   switch (rightOp.type) {
-    // case 'insert_text': {
-    // }
+    case 'insert_text': {
+      if (Path.equals(leftOp.path, Path.next(rightOp.path))) {
+        return [
+          {
+            ...leftOp,
+            position: leftOp.position + rightOp.text.length,
+          },
+        ];
+      }
+
+      return [leftOp];
+    }
 
     // case 'remove_text': {
     // }
 
-    // case 'insert_node': {
-    // }
+    case 'insert_node': {
+      if (!Path.equals(leftOp.path, rightOp.path)) {
+        return [
+          {
+            ...leftOp,
+            path: Path.transform(leftOp.path, rightOp)!,
+          },
+        ];
+      }
+
+      const offset = Text.isText(rightOp.node)
+        ? rightOp.node.text.length
+        : rightOp.node.children.length;
+
+      return [
+        leftOp, // merge the inserted node
+        {
+          ...leftOp, // merge the original node
+          position: leftOp.position + offset,
+        },
+      ];
+    }
 
     // case 'remove_node': {
     // }

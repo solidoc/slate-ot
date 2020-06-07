@@ -1,5 +1,5 @@
 // import { slateType } from '../src/SlateType';
-import { Operation, Transforms, Path, Node, Text } from 'slate';
+import { Operation, Transforms, Path, Node, Text, Ancestor } from 'slate';
 import * as fuzzer from 'ot-fuzzer';
 import * as _ from 'lodash';
 
@@ -38,13 +38,6 @@ const BLOCKS = ['block1', 'block2', 'block3', 'block4', 'block5'];
 
 export const getAllTextPaths = (node: Node): Path[] => {
   let array: Path[] = [];
-  // if (Text.isText(node)) {
-  //   array.push(path);
-  // } else {
-  //   node.children.forEach((n, i) => {
-  //     array = array.concat(getAllTextPaths(n, [...path, i]));
-  //   });
-  // }
   for (let [, p] of Node.texts(node)) {
     array.push(p);
   }
@@ -115,13 +108,6 @@ export const getRandomPathTo = (root: Node): Path => {
   return path;
 };
 
-export const generateRandomNode = (): Node => {
-  return {
-    type: BLOCKS[fuzzer.randomInt(BLOCKS.length)],
-    children: [{ text: fuzzer.randomWord() }, { text: fuzzer.randomWord() }],
-  };
-};
-
 export const generateAndApplyRandomOp = function (snapshot) {
   const result = _.cloneDeep(snapshot);
 
@@ -170,10 +156,38 @@ export const generateRandomRemoveTextOp = (snapshot): Operation | null => {
 export const generateRandomInsertNodeOp = (snapshot): Operation => {
   const randomPath = getRandomPathTo(snapshot);
 
+  const parent = <Ancestor>Node.get(snapshot, Path.parent(randomPath));
+
+  let node;
+
+  if (parent.children[0] && Text.isText(parent.children[0])) {
+    node = { text: fuzzer.randomWord() };
+  } else if (!parent.children[0] && fuzzer.randomInt(3) === 0) {
+    node = { text: fuzzer.randomWord() };
+  } else if (fuzzer.randomInt(2) === 0) {
+    node = {
+      type: BLOCKS[fuzzer.randomInt(BLOCKS.length)],
+      children: [{ text: fuzzer.randomWord() }, { text: fuzzer.randomWord() }],
+    };
+  } else {
+    node = {
+      type: BLOCKS[fuzzer.randomInt(BLOCKS.length)],
+      children: [
+        {
+          type: BLOCKS[fuzzer.randomInt(BLOCKS.length)],
+          children: [
+            { text: fuzzer.randomWord() },
+            { text: fuzzer.randomWord() },
+          ],
+        },
+      ],
+    };
+  }
+
   return {
     type: 'insert_node',
     path: randomPath,
-    node: generateRandomNode(),
+    node,
   };
 };
 
@@ -243,9 +257,9 @@ export const generateRandomMergeNodeOp = (snapshot): Operation | null => {
 };
 
 const genRandOp = [
-  // generateRandomInsertTextOp,
+  generateRandomInsertTextOp,
   // generateRandomRemoveTextOp,
-  // generateRandomInsertNodeOp,
+  generateRandomInsertNodeOp,
   // generateRandomRemoveNodeOp,
   generateRandomSplitNodeOp,
   generateRandomMergeNodeOp,
