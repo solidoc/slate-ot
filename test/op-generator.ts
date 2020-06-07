@@ -208,10 +208,45 @@ export const generateRandomSplitNodeOp = (snapshot): Operation | null => {
     : null;
 };
 
+export const generateRandomMergeNodeOp = (snapshot): Operation | null => {
+  const randomPath = getRandomPathFrom(snapshot);
+
+  if (randomPath.length == 0 || randomPath[randomPath.length - 1] == 0) {
+    return null;
+  }
+
+  const prev = Node.get(snapshot, Path.previous(randomPath));
+
+  const node = Node.get(snapshot, randomPath);
+
+  if (Text.isText(prev) && Text.isText(node)) {
+    return {
+      type: 'merge_node',
+      path: randomPath,
+      position: prev.text.length,
+      target: null,
+      properties: {},
+    };
+  }
+
+  if (!Text.isText(prev) && !Text.isText(node)) {
+    return {
+      type: 'merge_node',
+      path: randomPath,
+      position: prev.children.length,
+      target: null,
+      properties: {},
+    };
+  }
+
+  return null;
+};
+
 const genRandOp = [
-  generateRandomInsertTextOp,
-  generateRandomRemoveTextOp,
-  generateRandomInsertNodeOp,
-  generateRandomRemoveNodeOp,
+  // generateRandomInsertTextOp,
+  // generateRandomRemoveTextOp,
+  // generateRandomInsertNodeOp,
+  // generateRandomRemoveNodeOp,
   generateRandomSplitNodeOp,
+  generateRandomMergeNodeOp,
 ];
