@@ -130,6 +130,25 @@ export const transRemoveText = (
       ];
     }
 
+    case 'merge_node': {
+      if (!Path.equals(leftOp.path, rightOp.path)) {
+        return [
+          {
+            ...leftOp,
+            path: Path.transform(leftOp.path, rightOp)!,
+          },
+        ];
+      }
+
+      return [
+        {
+          ...leftOp,
+          path: Path.previous(rightOp.path),
+          offset: leftOp.offset + rightOp.position,
+        },
+      ];
+    }
+
     default:
       throw new Error('Unsupported OP');
   }

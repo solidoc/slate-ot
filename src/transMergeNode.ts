@@ -19,8 +19,18 @@ export const transMergeNode = (
       return [leftOp];
     }
 
-    // case 'remove_text': {
-    // }
+    case 'remove_text': {
+      if (Path.equals(leftOp.path, Path.next(rightOp.path))) {
+        return [
+          {
+            ...leftOp,
+            position: leftOp.position - rightOp.text.length,
+          },
+        ];
+      }
+
+      return [leftOp];
+    }
 
     case 'insert_node': {
       if (!Path.equals(leftOp.path, rightOp.path)) {

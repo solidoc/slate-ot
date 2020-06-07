@@ -258,7 +258,7 @@ export const generateRandomMergeNodeOp = (snapshot): Operation | null => {
 
 const genRandOp = [
   generateRandomInsertTextOp,
-  // generateRandomRemoveTextOp,
+  generateRandomRemoveTextOp,
   generateRandomInsertNodeOp,
   // generateRandomRemoveNodeOp,
   generateRandomSplitNodeOp,
