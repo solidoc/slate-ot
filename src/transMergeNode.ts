@@ -55,8 +55,21 @@ export const transMergeNode = (
       ];
     }
 
-    // case 'remove_node': {
-    // }
+    case 'remove_node': {
+      if (Path.equals(leftOp.path, Path.next(rightOp.path))) {
+        return [];
+      }
+
+      const path = Path.transform(leftOp.path, rightOp);
+      return path
+        ? [
+            {
+              ...leftOp,
+              path,
+            },
+          ]
+        : [];
+    }
 
     case 'split_node': {
       if (Path.equals(leftOp.path, rightOp.path)) {

@@ -1,16 +1,16 @@
 import {
   InsertNodeOperation,
-  InsertTextOperation,
+  SplitNodeOperation,
+  MergeNodeOperation,
   Operation,
   Path,
-  Text,
 } from 'slate';
 
 export const transInsertNode = (
   leftOp: InsertNodeOperation,
   rightOp: Operation,
   side: 'left' | 'right'
-): (InsertNodeOperation | InsertTextOperation)[] => {
+): (InsertNodeOperation | SplitNodeOperation | MergeNodeOperation)[] => {
   switch (rightOp.type) {
     case 'insert_text': {
       return [leftOp];
@@ -71,27 +71,15 @@ export const transInsertNode = (
         ];
       }
 
-      if (Text.isText(leftOp.node)) {
-        return [
-          {
-            ...leftOp,
-            type: 'insert_text',
-            path: Path.previous(rightOp.path),
-            offset: rightOp.position,
-            text: leftOp.node.text,
-          },
-        ];
-      }
-
-      const result: InsertNodeOperation[] = [];
-      leftOp.node.children.forEach((child) => {
-        result.push({
-          ...leftOp,
-          node: child,
-        });
-      });
-
-      return result;
+      return [
+        {
+          ...rightOp,
+          type: 'split_node',
+        },
+        leftOp,
+        rightOp,
+        rightOp,
+      ];
     }
 
     default:
