@@ -89,6 +89,47 @@ export const transRemoveText = (
         : [];
     }
 
+    case 'split_node': {
+      if (!Path.equals(leftOp.path, rightOp.path)) {
+        return [
+          {
+            ...leftOp,
+            path: Path.transform(leftOp.path, rightOp)!,
+          },
+        ];
+      }
+
+      // text to remove all within the former segment
+      if (leftOp.offset + leftOp.text.length <= rightOp.position) {
+        return [leftOp];
+      }
+
+      // text to remove all within the latter segment
+      if (leftOp.offset >= rightOp.position) {
+        return [
+          {
+            ...leftOp,
+            path: Path.next(rightOp.path),
+            offset: leftOp.offset - rightOp.position,
+          },
+        ];
+      }
+
+      // text to remove in both segments
+      return [
+        {
+          ...leftOp,
+          text: leftOp.text.slice(0, rightOp.position - leftOp.offset),
+        },
+        {
+          ...leftOp,
+          path: Path.next(rightOp.path),
+          offset: 0,
+          text: leftOp.text.slice(rightOp.position - leftOp.offset),
+        },
+      ];
+    }
+
     default:
       throw new Error('Unsupported OP');
   }

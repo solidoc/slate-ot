@@ -24,7 +24,29 @@ export const transSplitNode = (
     }
 
     case 'remove_text': {
-      return [leftOp];
+      if (!Path.equals(leftOp.path, rightOp.path)) {
+        return [leftOp];
+      }
+
+      if (leftOp.position < rightOp.offset) {
+        return [leftOp];
+      }
+
+      if (leftOp.position >= rightOp.offset + rightOp.text.length) {
+        return [
+          {
+            ...leftOp,
+            position: leftOp.position - rightOp.text.length,
+          },
+        ];
+      }
+
+      return [
+        {
+          ...leftOp,
+          position: rightOp.offset,
+        },
+      ];
     }
 
     case 'insert_node': {
