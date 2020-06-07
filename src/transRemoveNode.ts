@@ -45,13 +45,11 @@ export const transRemoveNode = (
         ];
       }
 
-      const removeNextOp: RemoveNodeOperation = {
-        type: 'remove_node',
-        path: Path.next(leftOp.path),
-        node: { text: '' },
-      };
-
-      return [leftOp, removeNextOp];
+      // should remove the target node && the split node
+      //   however, after removing the target node,
+      //   the split node becomes the same path.
+      // TODO: node within op should be split.
+      return [leftOp, leftOp];
     }
 
     default:
