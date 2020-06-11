@@ -86,6 +86,10 @@ export const transInsertNode = (
     }
 
     case 'move_node': {
+      if (Path.equals(rightOp.path, rightOp.newPath)) {
+        return [leftOp];
+      }
+
       const [rr, ri] = decomposeMove(rightOp);
       const [l] = xTransformMxN([leftOp], [rr, ri], side);
 
