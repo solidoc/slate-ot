@@ -47,7 +47,6 @@ const xTransformMxN = (
   side: 'left' | 'right'
 ): [Operation[], Operation[]] => {
   let leftRes: Operation[] = [];
-  let rightRes: Operation[] = [];
 
   for (let m = 0; m < leftOps.length; m++) {
     let leftOp: Operation = leftOps[m];
@@ -59,7 +58,7 @@ const xTransformMxN = (
     rightOps = rRes;
   }
 
-  return [leftRes, rightRes];
+  return [leftRes, rightOps];
 };
 
 const xTransform1xN = (
@@ -73,6 +72,7 @@ const xTransform1xN = (
     let rightOp: Operation = rightOps[n];
 
     let [l, r] = xTransform1x1(leftOp, rightOp, side);
+    rRes = rRes.concat(r);
 
     if (l.length === 0) {
       rRes = rRes.concat(rightOps.slice(n + 1));
@@ -86,7 +86,6 @@ const xTransform1xN = (
     }
 
     // l.length == 1
-    rRes = rRes.concat(r);
     leftOp = l[0];
   }
   return [[leftOp], rRes];
@@ -123,9 +122,11 @@ const doTransform = (
       return OT.transSplitNode(leftOp, rightOp, side);
     case 'merge_node':
       return OT.transMergeNode(leftOp, rightOp, side);
+    case 'move_node':
+      return OT.transMoveNode(leftOp, rightOp, side);
     default:
       throw new Error('Unsupported OP');
   }
 };
 
-export { slateType };
+export { slateType, xTransformMxN };

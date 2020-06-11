@@ -3,38 +3,7 @@ import { Operation, Transforms, Path, Node, Text, Ancestor } from 'slate';
 import * as fuzzer from 'ot-fuzzer';
 import * as _ from 'lodash';
 
-// const MARKS = ['mark1', 'mark2', 'mark3', 'mark4', 'mark5'];
 const BLOCKS = ['block1', 'block2', 'block3', 'block4', 'block5'];
-
-// /**
-//  * We use the Operations.apply function since we expect the apply function to work in Slate
-//  * @param {Value} snapshot
-//  */
-// export const generateRandomOp = function (snapshot) {
-//   // don't allow for remove node ops if document is empty
-//   if (snapshot.document.nodes.size === 0)
-//     return generateRandomInsertNodeOp(snapshot);
-//   // don't allow for insert text op if no leaf nodes
-
-//   let op = {};
-//   switch (fuzzer.randomInt(AVAILIBLE_OPS_LEN)) {
-//     case 0: {
-//       const randomLeaf = getRandomLeafWithPath(snapshot.toJSON().document);
-//       if (randomLeaf) {
-//         op = generateRandomInsertTextOp(snapshot, randomLeaf);
-//       } else {
-//         op = generateRandomInsertNodeOp(snapshot);
-//       }
-//       break;
-//     }
-//     case 1:
-//       op = generateRandomAddMarkOp(snapshot);
-//       break;
-//     default:
-//       throw Error('Error generating random op');
-//   }
-//   return op;
-// };
 
 export const getAllTextPaths = (node: Node): Path[] => {
   let array: Path[] = [];
@@ -256,11 +225,35 @@ export const generateRandomMergeNodeOp = (snapshot): Operation | null => {
   return null;
 };
 
+export const generateRandomMoveNodeOp = (snapshot): Operation | null => {
+  while (1) {
+    const path = getRandomPathFrom(snapshot);
+    const newPath = getRandomPathTo(snapshot);
+
+    if (Path.isSibling(path, newPath)) {
+      const parent = <Ancestor>Node.get(snapshot, Path.parent(newPath));
+      if (newPath[newPath.length - 1] == parent.children.length) {
+        newPath[newPath.length - 1]--;
+      }
+    }
+
+    if (!Path.isAncestor(path, newPath)) {
+      return {
+        type: 'move_node',
+        path,
+        newPath,
+      };
+    }
+  }
+  return null;
+};
+
 const genRandOp = [
-  generateRandomInsertTextOp,
-  generateRandomRemoveTextOp,
-  generateRandomInsertNodeOp,
-  generateRandomRemoveNodeOp,
-  generateRandomSplitNodeOp,
-  generateRandomMergeNodeOp,
+  // generateRandomInsertTextOp,
+  // generateRandomRemoveTextOp,
+  // generateRandomInsertNodeOp,
+  // generateRandomRemoveNodeOp,
+  // generateRandomSplitNodeOp,
+  // generateRandomMergeNodeOp,
+  generateRandomMoveNodeOp,
 ];

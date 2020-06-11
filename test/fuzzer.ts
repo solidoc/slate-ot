@@ -3,15 +3,17 @@ import { slateType } from '../src/SlateType';
 import { createEditor, Element, Editor } from 'slate';
 import * as _ from 'lodash';
 import { generateAndApplyRandomOp } from './op-generator';
-// const fuzzer = require('ot-fuzzer');
 import * as fuzzer from 'ot-fuzzer';
 
 const testDoc: Element = {
   children: [
     {
       type: 'paragraph',
-      children: [{ text: 'ABCDEF' }, { text: 'Test' }],
-      // children: [{ text: 'A quick brown fox jumps over the lazy dog.' }],
+      children: [{ text: 'ABC' }, { text: 'Test' }],
+    },
+    {
+      type: 'checklist',
+      children: [{ text: '123' }, { text: 'xyz' }],
     },
   ],
 };
