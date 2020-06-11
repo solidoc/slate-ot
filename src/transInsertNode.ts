@@ -6,6 +6,9 @@ import {
   Path,
 } from 'slate';
 
+import { xTransformMxN } from './SlateType';
+import { decomposeMove } from './transMoveNode';
+
 export const transInsertNode = (
   leftOp: InsertNodeOperation,
   rightOp: Operation,
@@ -80,6 +83,13 @@ export const transInsertNode = (
         rightOp,
         rightOp,
       ];
+    }
+
+    case 'move_node': {
+      const [rr, ri] = decomposeMove(rightOp);
+      const [l] = xTransformMxN([leftOp], [rr, ri], side);
+
+      return <InsertNodeOperation[]>l;
     }
 
     default:

@@ -17,6 +17,8 @@ export const transMoveNode = (
     return [];
   }
 
+  let [lr, li] = decomposeMove(leftOp);
+
   switch (rightOp.type) {
     // case 'insert_text': {
     // }
@@ -24,8 +26,13 @@ export const transMoveNode = (
     // case 'remove_text': {
     // }
 
-    // case 'insert_node': {
-    // }
+    case 'insert_node': {
+      let [l] = xTransformMxN([lr, li], [rightOp], side);
+
+      return [
+        composeMove(<RemoveNodeOperation>l[0], <InsertNodeOperation>l[1]),
+      ];
+    }
 
     // case 'remove_node': {
     // }
@@ -42,7 +49,6 @@ export const transMoveNode = (
         return [leftOp];
       }
 
-      let [lr, li] = decomposeMove(leftOp);
       let [rr, ri] = decomposeMove(rightOp);
 
       let [l, r] = xTransformMxN([lr, li], [rr, ri], side);
@@ -91,7 +97,7 @@ export const transMoveNode = (
   }
 };
 
-const decomposeMove = (
+export const decomposeMove = (
   op: MoveNodeOperation
 ): [RemoveNodeOperation, InsertNodeOperation] => {
   const rem: RemoveNodeOperation = {
