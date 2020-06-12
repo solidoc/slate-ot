@@ -226,7 +226,9 @@ export const generateRandomMergeNodeOp = (snapshot): Operation | null => {
 };
 
 export const generateRandomMoveNodeOp = (snapshot): Operation | null => {
-  while (1) {
+  let count = 0;
+  while (count < 10) {
+    count++;
     const path = getRandomPathFrom(snapshot);
     const newPath = getRandomPathTo(snapshot);
 
@@ -249,10 +251,10 @@ export const generateRandomMoveNodeOp = (snapshot): Operation | null => {
 };
 
 const genRandOp = [
-  // generateRandomInsertTextOp,
-  // generateRandomRemoveTextOp,
-  // generateRandomInsertNodeOp,
-  // generateRandomRemoveNodeOp,
+  generateRandomInsertTextOp,
+  generateRandomRemoveTextOp,
+  generateRandomInsertNodeOp,
+  generateRandomRemoveNodeOp,
   generateRandomSplitNodeOp,
   generateRandomMergeNodeOp,
   generateRandomMoveNodeOp,

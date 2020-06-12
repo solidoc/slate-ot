@@ -78,6 +78,7 @@ export const transInsertNode = (
         {
           ...rightOp,
           type: 'split_node',
+          path: Path.previous(rightOp.path),
         },
         leftOp,
         rightOp,
