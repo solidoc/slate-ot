@@ -6,7 +6,7 @@ import {
   Path,
 } from 'slate';
 
-import { xTransformMxN } from '../src/SlateType';
+import { xTransformMxN } from './SlateType';
 
 export const transMoveNode = (
   leftOp: MoveNodeOperation,
@@ -69,11 +69,82 @@ export const transMoveNode = (
       }
     }
 
-    // case 'split_node': {
-    // }
+    case 'split_node': {
+      const after: boolean =
+        Path.isSibling(leftOp.path, leftOp.newPath) &&
+        Path.endsBefore(leftOp.path, leftOp.newPath);
 
-    // case 'merge_node': {
-    // }
+      // the split nodes have to move separately
+      if (Path.equals(leftOp.path, rightOp.path)) {
+        const newPath = Path.transform(leftOp.newPath, rightOp)!;
+        // the split nodes are moved AFTER newPath
+        if (after) {
+          return [
+            {
+              ...leftOp, // move first node
+              newPath,
+            },
+            {
+              ...leftOp, // move second node
+              newPath,
+            },
+          ];
+        }
+        // the split nodes are moved BEFORE newPath
+        else {
+          const firstMove: MoveNodeOperation = {
+            ...leftOp, // move second node
+            path: Path.next(leftOp.path),
+            newPath,
+          };
+
+          const secondMove: MoveNodeOperation = {
+            ...leftOp, // move first node
+            path: Path.transform(leftOp.path, firstMove)!,
+            newPath: Path.previous(Path.transform(newPath, firstMove)!),
+          };
+
+          return [firstMove, secondMove];
+        }
+      }
+
+      let newPath = Path.transform(leftOp.newPath, rightOp)!;
+
+      // the newPath is between the split nodes
+      // note that it is impossible for newPath == rightOp.path
+      if (Path.equals(newPath, Path.next(rightOp.path)) && !after) {
+        newPath = rightOp.path;
+      }
+      // finally, the normal case
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+          newPath,
+        },
+      ];
+    }
+
+    case 'merge_node': {
+      let path = rightOp.path;
+      let prevPath = Path.previous(path);
+
+      path = Path.transform(path, leftOp)!;
+      prevPath = Path.transform(prevPath, leftOp)!;
+
+      // ops conflict with each other, discard move
+      if (!Path.equals(path, Path.next(prevPath))) {
+        return [];
+      }
+
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+          newPath: Path.transform(leftOp.newPath, rightOp)!,
+        },
+      ];
+    }
 
     case 'move_node': {
       // the other side didn't do anything
@@ -171,7 +242,7 @@ const composeMove = (
   };
 };
 
-const reverseMove = (
+export const reverseMove = (
   rem: RemoveNodeOperation,
   ins: InsertNodeOperation
 ): MoveNodeOperation => {

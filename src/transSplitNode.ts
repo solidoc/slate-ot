@@ -142,6 +142,15 @@ export const transSplitNode = (
       ];
     }
 
+    case 'move_node': {
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        },
+      ];
+    }
+
     default:
       throw new Error('Unsupported OP');
   }

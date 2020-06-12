@@ -253,7 +253,7 @@ const genRandOp = [
   generateRandomRemoveTextOp,
   generateRandomInsertNodeOp,
   generateRandomRemoveNodeOp,
-  // generateRandomSplitNodeOp,
+  generateRandomSplitNodeOp,
   // generateRandomMergeNodeOp,
   generateRandomMoveNodeOp,
 ];
