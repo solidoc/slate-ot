@@ -4,6 +4,7 @@ import {
   RemoveNodeOperation,
   Operation,
   Path,
+  SplitNodeOperation,
 } from 'slate';
 
 import { xTransformMxN } from './SlateType';
@@ -12,7 +13,7 @@ export const transMoveNode = (
   leftOp: MoveNodeOperation,
   rightOp: Operation,
   side: 'left' | 'right'
-): (MoveNodeOperation | InsertNodeOperation | RemoveNodeOperation)[] => {
+): (MoveNodeOperation | RemoveNodeOperation | SplitNodeOperation)[] => {
   if (Path.equals(leftOp.path, leftOp.newPath)) {
     return [];
   }
@@ -132,9 +133,16 @@ export const transMoveNode = (
       path = Path.transform(path, leftOp)!;
       prevPath = Path.transform(prevPath, leftOp)!;
 
-      // ops conflict with each other, discard move
+      // ops conflict with each other, discard merge
       if (!Path.equals(path, Path.next(prevPath))) {
-        return [];
+        return [
+          {
+            ...rightOp,
+            type: 'split_node',
+            path: Path.previous(rightOp.path),
+          },
+          leftOp,
+        ];
       }
 
       return [

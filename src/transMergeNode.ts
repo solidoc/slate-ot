@@ -6,8 +6,6 @@ import {
   MoveNodeOperation,
 } from 'slate';
 
-import { decomposeMove, reverseMove } from './transMoveNode';
-
 export const transMergeNode = (
   leftOp: MergeNodeOperation,
   rightOp: Operation,
@@ -136,10 +134,9 @@ export const transMergeNode = (
       path = Path.transform(path, rightOp)!;
       prevPath = Path.transform(prevPath, rightOp)!;
 
-      // ops conflict with each other, discard move
+      // ops conflict with each other, discard merge
       if (!Path.equals(path, Path.next(prevPath))) {
-        let [rr, ri] = decomposeMove(rightOp);
-        return [reverseMove(rr, ri), leftOp];
+        return [];
       }
 
       return [
