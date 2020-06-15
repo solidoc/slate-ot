@@ -36,8 +36,24 @@ export const transSetNode = (
         : [];
     }
 
-    // case 'split_node': {
-    // }
+    case 'split_node': {
+      if (!Path.equals(leftOp.path, rightOp.path)) {
+        return [
+          {
+            ...leftOp,
+            path: Path.transform(leftOp.path, rightOp)!,
+          },
+        ];
+      }
+
+      return [
+        leftOp,
+        {
+          ...leftOp,
+          path: Path.next(leftOp.path),
+        },
+      ];
+    }
 
     // case 'merge_node': {
     // }
