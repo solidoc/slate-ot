@@ -4,8 +4,8 @@ import { transInsertNode } from './transInsertNode';
 import { transRemoveNode } from './transRemoveNode';
 import { transSplitNode } from './transSplitNode';
 import { transMergeNode } from './transMergeNode';
-import { transSetNode } from './transSetNode';
 import { transMoveNode } from './transMoveNode';
+import { transSetNode } from './transSetNode';
 
 export const OT = {
   transInsertText,
@@ -14,6 +14,6 @@ export const OT = {
   transRemoveNode,
   transSplitNode,
   transMergeNode,
-  transSetNode,
   transMoveNode,
+  transSetNode,
 };

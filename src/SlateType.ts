@@ -122,10 +122,10 @@ const doTransform = (
       return OT.transSplitNode(leftOp, rightOp, side);
     case 'merge_node':
       return OT.transMergeNode(leftOp, rightOp, side);
-    case 'set_node':
-      return OT.transSetNode(leftOp, rightOp, side);
     case 'move_node':
       return OT.transMoveNode(leftOp, rightOp, side);
+    case 'set_node':
+      return OT.transSetNode(leftOp, rightOp, side);
     default:
       throw new Error('Unsupported OP');
   }
