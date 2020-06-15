@@ -210,13 +210,26 @@ export const generateRandomMergeNodeOp = (snapshot): Operation | null => {
 
   const node = Node.get(snapshot, randomPath);
 
+  const properties = {};
+
+  // Object.keys(prev).forEach((key) => {
+  //   if (key !== 'text' && key !== 'children') {
+  //     properties[key] = null;
+  //   }
+  // });
+  // Object.keys(node).forEach((key) => {
+  //   if (key !== 'text' && key !== 'children') {
+  //     properties[key] = node[key];
+  //   }
+  // });
+
   if (Text.isText(prev) && Text.isText(node)) {
     return {
       type: 'merge_node',
       path: randomPath,
       position: prev.text.length,
       target: null,
-      properties: {},
+      properties,
     };
   }
 
@@ -226,7 +239,7 @@ export const generateRandomMergeNodeOp = (snapshot): Operation | null => {
       path: randomPath,
       position: prev.children.length,
       target: null,
-      properties: {},
+      properties,
     };
   }
 
@@ -287,7 +300,7 @@ const genRandOp = [
   generateRandomInsertNodeOp,
   generateRandomRemoveNodeOp,
   generateRandomSplitNodeOp,
-  // generateRandomMergeNodeOp,
+  generateRandomMergeNodeOp,
   // generateRandomMoveNodeOp,
   generateRandomSetNodeOp,
 ];

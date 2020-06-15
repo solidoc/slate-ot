@@ -4,6 +4,7 @@ import {
   MergeNodeOperation,
   Operation,
   Path,
+  Text,
 } from 'slate';
 
 import { xTransformMxN } from './SlateType';
@@ -74,6 +75,9 @@ export const transInsertNode = (
         ];
       }
 
+      const offset = Text.isText(leftOp.node)
+        ? leftOp.node.text.length
+        : leftOp.node.children.length;
       return [
         {
           ...rightOp,
@@ -82,7 +86,10 @@ export const transInsertNode = (
         },
         leftOp,
         rightOp,
-        rightOp,
+        {
+          ...rightOp,
+          position: rightOp.position + offset,
+        },
       ];
     }
 

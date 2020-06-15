@@ -4,13 +4,14 @@ import {
   Path,
   Text,
   MoveNodeOperation,
+  RemoveNodeOperation,
 } from 'slate';
 
 export const transMergeNode = (
   leftOp: MergeNodeOperation,
   rightOp: Operation,
   _side: 'left' | 'right'
-): (MergeNodeOperation | MoveNodeOperation)[] => {
+): (MergeNodeOperation | MoveNodeOperation | RemoveNodeOperation)[] => {
   switch (rightOp.type) {
     case 'insert_text': {
       if (Path.equals(leftOp.path, Path.next(rightOp.path))) {
@@ -39,47 +40,92 @@ export const transMergeNode = (
     }
 
     case 'insert_node': {
-      if (!Path.equals(leftOp.path, rightOp.path)) {
+      if (Path.equals(leftOp.path, rightOp.path)) {
+        const offset = Text.isText(rightOp.node)
+          ? rightOp.node.text.length
+          : rightOp.node.children.length;
+
         return [
+          leftOp, // merge the inserted node
           {
-            ...leftOp,
-            path: Path.transform(leftOp.path, rightOp)!,
+            ...leftOp, // merge the original node
+            position: leftOp.position + offset,
           },
         ];
       }
 
-      const offset = Text.isText(rightOp.node)
-        ? rightOp.node.text.length
-        : rightOp.node.children.length;
+      if (Path.isParent(Path.previous(leftOp.path), rightOp.path)) {
+        return [
+          {
+            ...leftOp,
+            position: leftOp.position + 1,
+          },
+        ];
+      }
 
       return [
-        leftOp, // merge the inserted node
         {
-          ...leftOp, // merge the original node
-          position: leftOp.position + offset,
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
         },
       ];
     }
 
     case 'remove_node': {
-      if (Path.equals(leftOp.path, Path.next(rightOp.path))) {
-        return [];
+      if (Path.isParent(Path.previous(leftOp.path), rightOp.path)) {
+        return [
+          {
+            ...leftOp,
+            position: leftOp.position - 1,
+          },
+        ];
       }
 
       const path = Path.transform(leftOp.path, rightOp);
-      return path
-        ? [
-            {
-              ...leftOp,
-              path,
-            },
-          ]
-        : [];
+      const prevPath = Path.transform(Path.previous(leftOp.path), rightOp);
+
+      if (path && prevPath) {
+        return [
+          {
+            ...leftOp,
+            path,
+          },
+        ];
+      }
+
+      // conflicting ops, we have to discard merge
+      // for now we simply remove the merged node
+      else if (!path && prevPath) {
+        return [
+          {
+            ...rightOp,
+            path: prevPath,
+          },
+        ];
+      } else if (path && !prevPath) {
+        return [
+          {
+            ...rightOp,
+            path,
+          },
+        ];
+      }
+
+      // both to-merge nodes are removed
+      else {
+        return [];
+      }
     }
 
     case 'split_node': {
       if (Path.equals(leftOp.path, rightOp.path)) {
-        return [leftOp];
+        return [
+          leftOp,
+          {
+            ...leftOp,
+            position: leftOp.position + rightOp.position,
+          },
+        ];
       }
 
       if (Path.equals(Path.previous(leftOp.path), rightOp.path)) {
@@ -92,10 +138,26 @@ export const transMergeNode = (
         ];
       }
 
+      if (Path.isParent(Path.previous(leftOp.path), rightOp.path)) {
+        return [
+          {
+            ...leftOp,
+            position: leftOp.position + 1,
+          },
+        ];
+      }
+
+      const path = Path.transform(leftOp.path, rightOp)!;
+
+      // conflicting ops, we choose to discard merge
+      if (path[path.length - 1] === 0) {
+        return [];
+      }
+
       return [
         {
           ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
+          path,
         },
       ];
     }
@@ -111,6 +173,15 @@ export const transMergeNode = (
             ...leftOp,
             path: Path.previous(leftOp.path),
             position: leftOp.position + rightOp.position,
+          },
+        ];
+      }
+
+      if (Path.isParent(Path.previous(leftOp.path), rightOp.path)) {
+        return [
+          {
+            ...leftOp,
+            position: leftOp.position - 1,
           },
         ];
       }
@@ -145,6 +216,10 @@ export const transMergeNode = (
           path,
         },
       ];
+    }
+
+    case 'set_node': {
+      return [leftOp];
     }
 
     default:

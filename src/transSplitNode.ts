@@ -144,17 +144,34 @@ export const transSplitNode = (
 
     case 'merge_node': {
       if (Path.equals(leftOp.path, rightOp.path)) {
-        return [
-          {
-            ...leftOp,
-            path: Path.previous(rightOp.path),
-            position: leftOp.position + rightOp.position,
-          },
-        ];
+        return [];
       }
 
       if (Path.isParent(leftOp.path, rightOp.path)) {
-        //
+        const offset = rightOp.path[rightOp.path.length - 1];
+
+        if (leftOp.position < offset) {
+          return [leftOp];
+        }
+
+        if (leftOp.position > offset) {
+          return [
+            {
+              ...leftOp,
+              position: leftOp.position - 1,
+            },
+          ];
+        }
+
+        // conflicting ops, have to discard children merge first
+        return [
+          {
+            ...rightOp,
+            type: 'split_node',
+            path: Path.previous(rightOp.path),
+          },
+          leftOp,
+        ];
       }
 
       return [

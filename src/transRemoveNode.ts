@@ -61,17 +61,19 @@ export const transRemoveNode = (
     }
 
     case 'merge_node': {
+      // one of the to-merge nodes are removed, we have to discard merging
+      // it might be better to keep the unremoved node,
+      // but it is tricky to keep the original properties,
+      // for now we have to remove both nodes
       if (
-        Path.equals(leftOp.path, rightOp.path) ||
-        Path.equals(leftOp.path, Path.previous(rightOp.path))
+        Path.equals(leftOp.path, Path.previous(rightOp.path)) ||
+        Path.equals(leftOp.path, rightOp.path)
       ) {
         return [
           {
-            ...rightOp,
-            type: 'split_node',
+            ...leftOp,
             path: Path.previous(rightOp.path),
           },
-          leftOp,
         ];
       }
 

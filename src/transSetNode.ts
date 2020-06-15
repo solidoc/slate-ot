@@ -55,8 +55,18 @@ export const transSetNode = (
       ];
     }
 
-    // case 'merge_node': {
-    // }
+    case 'merge_node': {
+      if (Path.equals(leftOp.path, rightOp.path)) {
+        return [];
+      }
+
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        },
+      ];
+    }
 
     // case 'move_node': {
     // }
