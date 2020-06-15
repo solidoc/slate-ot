@@ -14,11 +14,27 @@ export const transSetNode = (
       return [leftOp];
     }
 
-    // case 'insert_node': {
-    // }
+    case 'insert_node': {
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        },
+      ];
+    }
 
-    // case 'remove_node': {
-    // }
+    case 'remove_node': {
+      const path = Path.transform(leftOp.path, rightOp);
+
+      return path
+        ? [
+            {
+              ...leftOp,
+              path,
+            },
+          ]
+        : [];
+    }
 
     // case 'split_node': {
     // }

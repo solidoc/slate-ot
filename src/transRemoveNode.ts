@@ -120,6 +120,10 @@ export const transRemoveNode = (
       return <RemoveNodeOperation[]>l;
     }
 
+    case 'set_node': {
+      return [leftOp];
+    }
+
     default:
       throw new Error('Unsupported OP');
   }

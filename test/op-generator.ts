@@ -233,26 +233,6 @@ export const generateRandomMergeNodeOp = (snapshot): Operation | null => {
   return null;
 };
 
-const KEYS = ['key1', 'key2', 'key3', 'key4', 'key5'];
-const VALUES = [null, true, false, 1, 'alpha'];
-export const generateRandomSetNodeOp = (snapshot): Operation => {
-  const path = getRandomPathFrom(snapshot);
-  const newProperties = {};
-
-  KEYS.forEach((key) => {
-    if (fuzzer.randomInt(2) === 0) {
-      newProperties[key] = VALUES[fuzzer.randomInt(VALUES.length)];
-    }
-  });
-
-  return {
-    type: 'set_node',
-    path,
-    properties: {},
-    newProperties,
-  };
-};
-
 export const generateRandomMoveNodeOp = (snapshot): Operation | null => {
   let count = 0;
   while (count < 10) {
@@ -278,11 +258,34 @@ export const generateRandomMoveNodeOp = (snapshot): Operation | null => {
   return null;
 };
 
+const KEYS = ['key1', 'key2', 'key3', 'key4', 'key5'];
+const VALUES = [null, true, false, 1, 'alpha'];
+export const generateRandomSetNodeOp = (snapshot): Operation | null => {
+  const path = getRandomPathFrom(snapshot);
+
+  if (path.length === 0) return null;
+
+  const newProperties = {};
+
+  KEYS.forEach((key) => {
+    if (fuzzer.randomInt(2) === 0) {
+      newProperties[key] = VALUES[fuzzer.randomInt(VALUES.length)];
+    }
+  });
+
+  return {
+    type: 'set_node',
+    path,
+    properties: {},
+    newProperties,
+  };
+};
+
 const genRandOp = [
   generateRandomInsertTextOp,
   generateRandomRemoveTextOp,
-  // generateRandomInsertNodeOp,
-  // generateRandomRemoveNodeOp,
+  generateRandomInsertNodeOp,
+  generateRandomRemoveNodeOp,
   // generateRandomSplitNodeOp,
   // generateRandomMergeNodeOp,
   // generateRandomMoveNodeOp,
