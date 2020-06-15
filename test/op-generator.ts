@@ -29,50 +29,58 @@ export const getRandomLeafWithPath = (snapshot: Node): TextWithPath | null => {
   return { ...t, path };
 };
 
-export const getRandomPathFrom = (root: Node): Path => {
+export const getRandomPathFrom = (snapshot: Node): Path => {
+  if (Text.isText(snapshot) || snapshot.children.length === 0) {
+    return [];
+  }
+
   const path: Path = [];
-  // let currentNode = root;
+  // let currentNode = snapshot;
   while (1) {
     // stop when you get to a leaf
-    if (Text.isText(root)) {
+    if (Text.isText(snapshot)) {
       return path;
     }
 
-    if (root.children.length === 0 || fuzzer.randomInt(3) === 0) {
-      return [];
+    if (snapshot.children.length === 0) {
+      return path;
+    }
+
+    if (fuzzer.randomInt(3) === 0 && path.length > 0) {
+      return path;
     }
 
     // continue
-    const index = <number>fuzzer.randomInt(root.children.length);
+    const index = <number>fuzzer.randomInt(snapshot.children.length);
     path.push(index);
-    root = root.children[index];
+    snapshot = snapshot.children[index];
   }
   return path;
 };
 
-export const getRandomPathTo = (root: Node): Path => {
+export const getRandomPathTo = (snapshot: Node): Path => {
   const path: Path = [];
-  // let currentNode = root;
+  // let currentNode = snapshot;
   while (1) {
     // stop when you get to a leaf
-    if (Text.isText(root)) {
+    if (Text.isText(snapshot)) {
       return path;
     }
 
-    if (root.children.length === 0) {
+    if (snapshot.children.length === 0) {
       return [...path, 0];
     }
 
     // randomly stop at the next level
     if (fuzzer.randomInt(3) === 0) {
-      const index = <number>fuzzer.randomInt(root.children.length + 1);
+      const index = <number>fuzzer.randomInt(snapshot.children.length + 1);
       return [...path, index];
     }
 
     // continue
-    const index = <number>fuzzer.randomInt(root.children.length);
+    const index = <number>fuzzer.randomInt(snapshot.children.length);
     path.push(index);
-    root = root.children[index];
+    snapshot = snapshot.children[index];
   }
   return path;
 };
@@ -225,6 +233,26 @@ export const generateRandomMergeNodeOp = (snapshot): Operation | null => {
   return null;
 };
 
+const KEYS = ['key1', 'key2', 'key3', 'key4', 'key5'];
+const VALUES = [null, true, false, 1, 'alpha'];
+export const generateRandomSetNodeOp = (snapshot): Operation => {
+  const path = getRandomPathFrom(snapshot);
+  const newProperties = {};
+
+  KEYS.forEach((key) => {
+    if (fuzzer.randomInt(2) === 0) {
+      newProperties[key] = VALUES[fuzzer.randomInt(VALUES.length)];
+    }
+  });
+
+  return {
+    type: 'set_node',
+    path,
+    properties: {},
+    newProperties,
+  };
+};
+
 export const generateRandomMoveNodeOp = (snapshot): Operation | null => {
   let count = 0;
   while (count < 10) {
@@ -251,11 +279,12 @@ export const generateRandomMoveNodeOp = (snapshot): Operation | null => {
 };
 
 const genRandOp = [
-  generateRandomInsertTextOp,
-  generateRandomRemoveTextOp,
-  generateRandomInsertNodeOp,
-  generateRandomRemoveNodeOp,
-  generateRandomSplitNodeOp,
-  generateRandomMergeNodeOp,
-  generateRandomMoveNodeOp,
+  // generateRandomInsertTextOp,
+  // generateRandomRemoveTextOp,
+  // generateRandomInsertNodeOp,
+  // generateRandomRemoveNodeOp,
+  // generateRandomSplitNodeOp,
+  // generateRandomMergeNodeOp,
+  generateRandomSetNodeOp,
+  // generateRandomMoveNodeOp,
 ];
