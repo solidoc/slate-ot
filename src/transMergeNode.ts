@@ -199,29 +199,42 @@ export const transMergeNode = (
         return [leftOp];
       }
 
-      let path = leftOp.path;
-      let prevPath = Path.previous(path);
+      const path = leftOp.path;
+      const prevPath = Path.previous(path);
 
-      path = Path.transform(path, rightOp)!;
-      prevPath = Path.transform(prevPath, rightOp)!;
+      const newPath = Path.transform(path, rightOp)!;
+      const newPrevPath = Path.transform(prevPath, rightOp)!;
 
       // Ops conflict with each other, discard merge.
-      // Note that the merge-and-split node cannot keep properties,
+      //  Note that the merge-and-split node cannot keep properties,
       //   so we have to remove it.
-      if (!Path.equals(path, Path.next(prevPath))) {
+      if (!Path.equals(newPath, Path.next(newPrevPath))) {
         return [
           {
             type: 'remove_node',
-            path,
+            path: newPath,
             node: { text: '' },
           },
         ];
       }
 
+      let position = leftOp.position;
+
+      // only src path is leftOp's child
+      if (Path.isParent(prevPath, rightOp.path)) {
+        position--;
+      }
+
+      // only dst path is leftOp's child
+      if (Path.isParent(prevPath, rightOp.newPath)) {
+        position++;
+      }
+
       return [
         {
           ...leftOp,
-          path,
+          path: newPath,
+          position,
         },
       ];
     }

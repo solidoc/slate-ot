@@ -187,20 +187,35 @@ export const transMoveNode = (
         return side === 'left' ? [reverseMove(rr, ri), leftOp] : [];
       }
 
-      // r.length === 2
-      if (l.length === 0 || l[0].type === 'insert_node') {
-        l[1] = l[0];
+      // for the rest we have r.length === 2
+      if (l.length === 0) {
         l[0] = {
           type: 'remove_node',
           path: ri.path.concat(lr.path.slice(rr.path.length)),
           node: { text: '' },
         };
-      }
-
-      if (l.length === 0 || l[0].type === 'remove_node') {
         l[1] = {
           type: 'insert_node',
           path: ri.path.concat(li.path.slice(rr.path.length)),
+          node: { text: '' },
+        };
+      }
+
+      // for the rest we have l.length === 1
+      else if (l[0].type === 'remove_node') {
+        l[1] = {
+          type: 'insert_node',
+          path: ri.path.concat(li.path.slice(rr.path.length)),
+          node: { text: '' },
+        };
+      }
+
+      // for the rest we have l[0].type === 'insert_node'
+      else {
+        l[1] = l[0];
+        l[0] = {
+          type: 'remove_node',
+          path: ri.path.concat(lr.path.slice(rr.path.length)),
           node: { text: '' },
         };
       }

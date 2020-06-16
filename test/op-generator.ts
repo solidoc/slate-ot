@@ -125,7 +125,7 @@ export const generateRandomRemoveTextOp = (snapshot): Operation | null => {
     type: 'remove_text',
     path: randomLeaf.path,
     offset,
-    text: randomLeaf.text.slice(offset, textLength),
+    text: randomLeaf.text.slice(offset, offset + textLength),
   };
 };
 

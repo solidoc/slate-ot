@@ -183,14 +183,35 @@ export const transSplitNode = (
     }
 
     case 'move_node': {
-      if (Path.isParent(leftOp.path, rightOp.path)) {
-        //
+      if (Path.equals(rightOp.path, rightOp.newPath)) {
+        return [leftOp];
+      }
+
+      let position = leftOp.position;
+      let offset = rightOp.path[rightOp.path.length - 1];
+      let newOffset = rightOp.newPath[rightOp.newPath.length - 1];
+
+      // only src path is leftOp's child
+      if (
+        Path.isParent(leftOp.path, rightOp.path) &&
+        offset < leftOp.position
+      ) {
+        position--;
+      }
+
+      // only dst path is leftOp's child
+      if (
+        Path.isParent(leftOp.path, rightOp.newPath) &&
+        newOffset < leftOp.position
+      ) {
+        position++;
       }
 
       return [
         {
           ...leftOp,
           path: Path.transform(leftOp.path, rightOp)!,
+          position,
         },
       ];
     }

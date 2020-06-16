@@ -98,10 +98,15 @@ export const transInsertNode = (
         return [leftOp];
       }
 
-      // the anchor node is moved
-      // we don't want to move with the anchor
+      // the anchor node is moved, but we don't want to move with the anchor
+      // hence the next of anchor is chosen as the new anchor
       if (Path.equals(leftOp.path, rightOp.path)) {
-        return [leftOp];
+        return [
+          {
+            ...leftOp,
+            path: Path.transform(Path.next(leftOp.path), rightOp)!,
+          },
+        ];
       }
 
       const [rr, ri] = decomposeMove(rightOp);

@@ -28,4 +28,4 @@ slateType.create = function (init: Element) {
   return <Editor>init;
 };
 
-fuzzer(slateType, generateAndApplyRandomOp, 10);
+fuzzer(slateType, generateAndApplyRandomOp, 1000);
