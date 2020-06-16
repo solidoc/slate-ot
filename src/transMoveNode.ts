@@ -152,6 +152,26 @@ export const transMoveNode = (
         ];
       }
 
+      // a tricky case:
+      //   if leftOp.path is a child of rightOp.prevPath,
+      //   and leftOp.newPath is a child of rightOp.path.
+      //   intentionally, leftOp wants to insert BEFORE leftOp.newPath;
+      //   but after merging, leftOp's path and newPath become siblings.
+      //   the move dst turns out to be AFTER the transformed newPath.
+      //   therefore we should move one step ahead
+      if (
+        Path.isParent(Path.previous(rightOp.path), leftOp.path) &&
+        Path.isParent(rightOp.path, leftOp.newPath)
+      ) {
+        return [
+          {
+            ...leftOp,
+            path: Path.transform(leftOp.path, rightOp)!,
+            newPath: Path.previous(Path.transform(leftOp.newPath, rightOp)!),
+          },
+        ];
+      }
+
       return [
         {
           ...leftOp,
