@@ -91,6 +91,7 @@ export const transMoveNode = (
             },
           ];
         }
+
         // the split nodes are moved BEFORE newPath
         else {
           const firstMove: MoveNodeOperation = {
@@ -116,6 +117,15 @@ export const transMoveNode = (
       if (Path.equals(newPath, Path.next(rightOp.path)) && !after) {
         newPath = rightOp.path;
       }
+
+      // a tricky case:
+      //   when after is true, and the splitOp separated path and newPath
+      //   to no-longer siblings, the after becomes false
+      //   in this case we should move one step after
+      else if (after && !Path.isSibling(leftOp.path, newPath)) {
+        newPath = Path.next(newPath);
+      }
+
       // finally, the normal case
       return [
         {
