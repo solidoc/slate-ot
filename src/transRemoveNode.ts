@@ -61,10 +61,10 @@ export const transRemoveNode = (
     }
 
     case 'merge_node': {
-      // one of the to-merge nodes are removed, we have to discard merging
-      // it might be better to keep the unremoved node,
-      // but it is tricky to keep the original properties,
-      // for now we have to remove both nodes
+      // One of the to-merge nodes are removed, we have to discard merging.
+      // It might be better to keep the unremoved node,
+      //   but it is tricky to keep properties by merge-and-split,
+      //   therefore we choose to remove the entired merged node
       if (
         Path.equals(leftOp.path, Path.previous(rightOp.path)) ||
         Path.equals(leftOp.path, rightOp.path)
@@ -113,7 +113,7 @@ export const transRemoveNode = (
           ...l,
           {
             type: 'remove_node',
-            path: Path.transform(r[0].path, l[0])!,
+            path: r[0].path,
             node: { text: '' },
           },
         ];

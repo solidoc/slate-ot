@@ -134,6 +134,8 @@ export const transMoveNode = (
       prevPath = Path.transform(prevPath, leftOp)!;
 
       // ops conflict with each other, discard merge
+      // Note that the merge-and-split node cannot keep properties,
+      //   so we have to remove it.
       if (!Path.equals(path, Path.next(prevPath))) {
         return [
           {
@@ -142,6 +144,11 @@ export const transMoveNode = (
             path: Path.previous(rightOp.path),
           },
           leftOp,
+          {
+            type: 'remove_node',
+            path,
+            node: { text: '' },
+          },
         ];
       }
 
@@ -201,6 +208,10 @@ export const transMoveNode = (
       return [
         composeMove(<RemoveNodeOperation>l[0], <InsertNodeOperation>l[1]),
       ];
+    }
+
+    case 'set_node': {
+      return [leftOp];
     }
 
     default:

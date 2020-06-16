@@ -301,6 +301,6 @@ const genRandOp = [
   generateRandomRemoveNodeOp,
   generateRandomSplitNodeOp,
   generateRandomMergeNodeOp,
-  // generateRandomMoveNodeOp,
+  generateRandomMoveNodeOp,
   generateRandomSetNodeOp,
 ];

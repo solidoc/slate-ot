@@ -205,9 +205,17 @@ export const transMergeNode = (
       path = Path.transform(path, rightOp)!;
       prevPath = Path.transform(prevPath, rightOp)!;
 
-      // ops conflict with each other, discard merge
+      // Ops conflict with each other, discard merge.
+      // Note that the merge-and-split node cannot keep properties,
+      //   so we have to remove it.
       if (!Path.equals(path, Path.next(prevPath))) {
-        return [];
+        return [
+          {
+            type: 'remove_node',
+            path,
+            node: { text: '' },
+          },
+        ];
       }
 
       return [

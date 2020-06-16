@@ -98,10 +98,25 @@ export const transInsertNode = (
         return [leftOp];
       }
 
+      // the anchor node is moved
+      // we don't want to move with the anchor
+      if (Path.equals(leftOp.path, rightOp.path)) {
+        return [leftOp];
+      }
+
       const [rr, ri] = decomposeMove(rightOp);
       const [l] = xTransformMxN([leftOp], [rr, ri], side);
 
-      return <InsertNodeOperation[]>l;
+      if (l.length == 1) return <InsertNodeOperation[]>l;
+
+      // l.length == 0, the parent node is moved
+      // in this case rr and ri will not be transformed by leftOp
+      return [
+        {
+          ...leftOp,
+          path: ri.path.concat(leftOp.path.slice(rr.path.length)),
+        },
+      ];
     }
 
     case 'set_node': {

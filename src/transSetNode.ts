@@ -68,8 +68,14 @@ export const transSetNode = (
       ];
     }
 
-    // case 'move_node': {
-    // }
+    case 'move_node': {
+      return [
+        {
+          ...leftOp,
+          path: Path.transform(leftOp.path, rightOp)!,
+        },
+      ];
+    }
 
     case 'set_node': {
       if (!Path.equals(leftOp.path, rightOp.path)) {
