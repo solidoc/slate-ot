@@ -235,7 +235,9 @@ export const transMoveNode = (
       else if (l[0].type === 'remove_node') {
         l[1] = {
           type: 'insert_node',
-          path: ri.path.concat(li.path.slice(rr.path.length)),
+          path: (<InsertNodeOperation>r[1]).path.concat(
+            li.path.slice((<RemoveNodeOperation>r[0]).path.length)
+          ),
           node: { text: '' },
         };
       }
