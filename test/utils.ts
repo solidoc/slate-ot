@@ -1,6 +1,9 @@
 import {
   Path,
   Node,
+  Text,
+  Operation,
+  Editor,
   InsertTextOperation,
   RemoveTextOperation,
   InsertNodeOperation,
@@ -10,6 +13,8 @@ import {
   MoveNodeOperation,
   SetNodeOperation,
 } from 'slate';
+
+import { slateType } from '../src/SlateType';
 
 export const makeOp = {
   insertText: (
@@ -90,4 +95,51 @@ export const makeOp = {
       newProperties,
     };
   },
+};
+
+export const applyOp = (
+  snapshot: Editor,
+  ops: Operation[] | Operation
+): Editor => {
+  slateType.normalize(ops).forEach((op) => {
+    checkOp(snapshot, op);
+    slateType.apply(snapshot, op);
+  });
+  return snapshot;
+};
+
+const checkOp = (snapshot: Editor, op: Operation) => {
+  switch (op.type) {
+    case 'remove_text': {
+      const leaf = Node.leaf(snapshot, op.path);
+      const textToRemove = leaf.text.slice(
+        op.offset,
+        op.offset + op.text.length
+      );
+
+      expect(textToRemove).toBe(op.text);
+
+      break;
+    }
+
+    case 'merge_node': {
+      const prev = Node.get(snapshot, Path.previous(op.path));
+
+      const prevLen = Text.isText(prev)
+        ? prev.text.length
+        : prev.children.length;
+
+      expect(prevLen).toBe(op.position);
+
+      break;
+    }
+
+    case 'remove_node': {
+      // op.node needs to be checked
+      break;
+    }
+
+    default:
+      return;
+  }
 };

@@ -1,5 +1,5 @@
-import { slateType, xTransformMxN } from '../src/SlateType';
-import { makeOp } from './makeOp';
+import { xTransformMxN } from '../src/SlateType';
+import { makeOp, applyOp } from './utils';
 import { Node } from 'slate';
 import * as _ from 'lodash';
 
@@ -32,8 +32,8 @@ describe('left side to removeNode, right side to:', () => {
   afterEach(() => {
     const [op12, op21] = xTransformMxN([op1], [op2], 'left');
 
-    doc1 = slateType.apply(slateType.apply(doc1, op1), op21);
-    doc2 = slateType.apply(slateType.apply(doc2, op2), op12);
+    doc1 = applyOp(applyOp(doc1, op1), op21);
+    doc2 = applyOp(applyOp(doc2, op2), op12);
 
     expect(doc1).toStrictEqual(doc2);
   });
