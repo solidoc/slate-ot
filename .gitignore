@@ -1,6 +1,5 @@
 node_modules
 dist
-example
 .idea
 .DS_Store
 .vscode
