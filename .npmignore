@@ -1,4 +1,11 @@
+index.ts
+src/
+
+example
+test
 node_modules
+
+
 .idea
 .DS_Store
 .vscode
@@ -7,13 +14,5 @@ node_modules
 .nyc_output
 .eslintrc.js
 .prettierrc.js
-
 package-lock.json
 
-example/
-test/
-src/
-index.ts
-
-dist/test
-dist/example
