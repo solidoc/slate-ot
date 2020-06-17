@@ -21,14 +21,6 @@ export const transMoveNode = (
   let [lr, li] = decomposeMove(leftOp);
 
   switch (rightOp.type) {
-    case 'insert_text': {
-      return [leftOp];
-    }
-
-    case 'remove_text': {
-      return [leftOp];
-    }
-
     case 'insert_node': {
       let [l] = xTransformMxN([lr, li], [rightOp], side);
 
@@ -120,7 +112,7 @@ export const transMoveNode = (
 
       // a tricky case:
       //   when after is true, and the splitOp separated path and newPath
-      //   to no-longer siblings, the after becomes false
+      //   to no-longer be siblings, the after becomes false
       //   in this case we should move one step after
       else if (after && !Path.isSibling(leftOp.path, newPath)) {
         newPath = Path.next(newPath);
@@ -210,10 +202,7 @@ export const transMoveNode = (
 
       // handling conflict
       if (r.length === 1) {
-        if (l.length !== 1 || l[0].type !== r[0].type) {
-          throw new Error('Unexpected xTransform');
-        }
-
+        // must have l.length === 1 && l[0].type === r[0].type)
         return side === 'left' ? [reverseMove(rr, ri), leftOp] : [];
       }
 
@@ -257,12 +246,11 @@ export const transMoveNode = (
       ];
     }
 
-    case 'set_node': {
-      return [leftOp];
-    }
-
+    // insert_text
+    // remove_text
+    // set_node
     default:
-      throw new Error('Unsupported OP');
+      return [leftOp];
   }
 };
 
