@@ -16,14 +16,6 @@ export const transInsertNode = (
   side: 'left' | 'right'
 ): (InsertNodeOperation | SplitNodeOperation | MergeNodeOperation)[] => {
   switch (rightOp.type) {
-    case 'insert_text': {
-      return [leftOp];
-    }
-
-    case 'remove_text': {
-      return [leftOp];
-    }
-
     case 'insert_node': {
       if (Path.equals(leftOp.path, rightOp.path) && side === 'left') {
         return [leftOp];
@@ -124,11 +116,10 @@ export const transInsertNode = (
       ];
     }
 
-    case 'set_node': {
-      return [leftOp];
-    }
-
+    // insert_text
+    // remove_text
+    // set_node
     default:
-      throw new Error('Unsupported OP');
+      return [leftOp];
   }
 };
