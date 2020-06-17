@@ -14,14 +14,6 @@ export const transRemoveNode = (
   side: 'left' | 'right'
 ): (RemoveNodeOperation | SplitNodeOperation)[] => {
   switch (rightOp.type) {
-    case 'insert_text': {
-      return [leftOp];
-    }
-
-    case 'remove_text': {
-      return [leftOp];
-    }
-
     case 'insert_node': {
       return [
         {
@@ -122,11 +114,10 @@ export const transRemoveNode = (
       return <RemoveNodeOperation[]>l;
     }
 
-    case 'set_node': {
-      return [leftOp];
-    }
-
+    // insert_text
+    // remove_text
+    // set_node
     default:
-      throw new Error('Unsupported OP');
+      return [leftOp];
   }
 };
