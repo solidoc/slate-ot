@@ -2,7 +2,8 @@
   "name": "slate-ot",
   "version": "0.0.1",
   "description": "transform between slate operations for collaboration",
-  "main": "index.ts",
+  "main": "./dist/index.js",
+  "type": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "fuzzer": "ts-node -r esm test/fuzzer.ts",
