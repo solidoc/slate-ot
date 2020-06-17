@@ -14,4 +14,5 @@ test/**/*.map
 config/**/*.map
 package-lock.json
 
+coverage
 report.*.json

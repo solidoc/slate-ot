@@ -1,5 +1,6 @@
-import { transMoveNode } from '../src/transMoveNode';
 import { MoveNodeOperation, Path } from 'slate';
+import { slateType, xTransformMxN } from '../src/SlateType';
+import * as _ from 'lodash';
 
 const makeMoveOp = (path: Path, newPath: Path): MoveNodeOperation => {
   return {
@@ -9,48 +10,58 @@ const makeMoveOp = (path: Path, newPath: Path): MoveNodeOperation => {
   };
 };
 
-describe('on move_node', () => {
-  test('moving the same node', () => {
-    const op1 = makeMoveOp([1], [2]);
-    const op2 = makeMoveOp([1], [0]);
+const doc = {
+  children: [
+    {
+      type: 'Paragraph',
+      children: [{ text: 'A' }, { text: 'B' }],
+    },
+    {
+      type: 'NumberedList',
+      children: [{ text: 'C' }, { text: 'D' }],
+    },
+    {
+      type: 'BulletedList',
+      children: [{ text: 'E' }, { text: 'F' }],
+    },
+  ],
+};
 
-    const op12 = transMoveNode(op1, op2, 'left');
-    const op21 = transMoveNode(op2, op1, 'right');
+describe('move_node + move_node', () => {
+  let doc1, doc2;
+  let op1, op2;
 
-    expect(op12).toEqual([makeMoveOp([0], [1]), op1]);
-    expect(op21).toEqual([]);
+  beforeEach(() => {
+    doc1 = _.cloneDeep(doc);
+    doc2 = _.cloneDeep(doc);
+  });
+
+  afterEach(() => {
+    const [op12, op21] = xTransformMxN([op1], [op2], 'left');
+
+    doc1 = slateType.apply(slateType.apply(doc1, op1), op21);
+    doc2 = slateType.apply(slateType.apply(doc2, op2), op12);
+
+    expect(doc1).toStrictEqual(doc2);
+  });
+
+  test('both sides moving the same node', () => {
+    op1 = makeMoveOp([1], [2]);
+    op2 = makeMoveOp([1], [0]);
   });
 
   test('ops making a circle', () => {
-    const op1 = makeMoveOp([1], [0, 0]);
-    const op2 = makeMoveOp([0], [1, 0]);
-
-    const op12 = transMoveNode(op1, op2, 'left');
-    const op21 = transMoveNode(op2, op1, 'right');
-
-    expect(op12).toEqual([makeMoveOp([0, 0], [0]), op1]);
-    expect(op21).toEqual([]);
+    op1 = makeMoveOp([1], [0, 0]);
+    op2 = makeMoveOp([0], [1, 0]);
   });
 
   test('moving within the same level', () => {
-    const op1 = makeMoveOp([1], [4]);
-    const op2 = makeMoveOp([2], [0]);
-
-    const op12 = transMoveNode(op1, op2, 'left');
-    const op21 = transMoveNode(op2, op1, 'right');
-
-    expect(op12).toEqual([makeMoveOp([2], [4])]);
-    expect(op21).toEqual([makeMoveOp([1], [0])]);
+    op1 = makeMoveOp([1], [4]);
+    op2 = makeMoveOp([2], [0]);
   });
 
   test('moving within a big node', () => {
-    const op1 = makeMoveOp([0, 0], [0, 1]);
-    const op2 = makeMoveOp([0], [1]);
-
-    const op12 = transMoveNode(op1, op2, 'left');
-    const op21 = transMoveNode(op2, op1, 'right');
-
-    expect(op12).toEqual([makeMoveOp([1, 0], [1, 1])]);
-    expect(op21).toEqual([op2]);
+    op1 = makeMoveOp([0, 0], [0, 1]);
+    op2 = makeMoveOp([0], [1]);
   });
 });
