@@ -216,11 +216,8 @@ export const transSplitNode = (
       ];
     }
 
-    case 'set_node': {
-      return [leftOp];
-    }
-
+    // set_node
     default:
-      throw new Error('Unsupported OP');
+      return [leftOp];
   }
 };

@@ -1,6 +1,7 @@
 import {
   Path,
   Node,
+  Element,
   Text,
   Operation,
   Editor,
@@ -142,4 +143,21 @@ const checkOp = (snapshot: Editor, op: Operation) => {
     default:
       return;
   }
+};
+
+export const initialDoc: Element = {
+  children: [
+    {
+      type: 'Paragraph',
+      children: [{ text: 'AB' }, { text: 'CD' }, { text: 'EF' }],
+    },
+    {
+      type: 'NumberedList',
+      children: [{ text: 'GH' }, { text: 'IJ' }, { text: 'KL' }],
+    },
+    {
+      type: 'BulletedList',
+      children: [{ text: 'MN' }, { text: 'OP' }, { text: 'QR' }],
+    },
+  ],
 };

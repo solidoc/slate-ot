@@ -1,32 +1,16 @@
 import { xTransformMxN } from '../src/SlateType';
-import { makeOp, applyOp } from './utils';
-import { Node } from 'slate';
+import { initialDoc, makeOp, applyOp } from './utils';
 import * as _ from 'lodash';
 
-const doc: Node = {
-  children: [
-    {
-      type: 'Paragraph',
-      children: [{ text: 'A' }, { text: 'B' }],
-    },
-    {
-      type: 'NumberedList',
-      children: [{ text: 'C' }, { text: 'D' }],
-    },
-    {
-      type: 'BulletedList',
-      children: [{ text: 'E' }, { text: 'F' }],
-    },
-  ],
-};
+const branch = initialDoc.children[0];
 
 describe('left side to moveNode, right side to:', () => {
   let doc1, doc2;
   let op1, op2;
 
   beforeEach(() => {
-    doc1 = _.cloneDeep(doc);
-    doc2 = _.cloneDeep(doc);
+    doc1 = _.cloneDeep(initialDoc);
+    doc2 = _.cloneDeep(initialDoc);
   });
 
   afterEach(() => {
@@ -48,56 +32,51 @@ describe('left side to moveNode, right side to:', () => {
   describe('removeText', () => {
     test('', () => {
       op1 = makeOp.moveNode([1], [0]);
-      op2 = makeOp.removeText([0, 1], 0, 'B');
+      op2 = makeOp.removeText([0, 1], 0, 'C');
     });
   });
 
   describe('insertNode', () => {
-    const branch: Node = {
-      children: [{ text: 'X' }, { text: 'Y' }],
-    };
-    const leaf: Node = { text: 'Z' };
-
     test('at moveOp.path', () => {
-      op1 = makeOp.moveNode([1], [0]);
-      op2 = makeOp.insertNode([1], branch);
+      op1 = makeOp.moveNode([2], [0]);
+      op2 = makeOp.insertNode([2], { children: [{ text: 'X' }] });
     });
 
     test('at moveOp.newPath', () => {
-      op1 = makeOp.moveNode([1], [0]);
-      op2 = makeOp.insertNode([0], branch);
+      op1 = makeOp.moveNode([1], [2]);
+      op2 = makeOp.insertNode([2], { children: [{ text: 'X' }] });
     });
 
-    test('within moveOp.path', () => {
+    test('at moveOp.path.child', () => {
       op1 = makeOp.moveNode([1], [0]);
-      op2 = makeOp.insertNode([1, 2], leaf);
+      op2 = makeOp.insertNode([1, 2], { text: 'X' });
     });
   });
 
   describe('removeNode', () => {
     test('at moveOp.path', () => {
-      op1 = makeOp.moveNode([1], [0]);
-      op2 = makeOp.removeNode([1], doc.children[1]);
+      op1 = makeOp.moveNode([0], [1]);
+      op2 = makeOp.removeNode([0], branch);
     });
 
     test('at moveOp.newPath', () => {
       op1 = makeOp.moveNode([1], [0]);
-      op2 = makeOp.removeNode([0], doc.children[0]);
+      op2 = makeOp.removeNode([0], branch);
     });
 
     test('at parent of moveOp.path', () => {
       op1 = makeOp.moveNode([0, 0], [1, 0]);
-      op2 = makeOp.removeNode([0], doc.children[0]);
+      op2 = makeOp.removeNode([0], branch);
     });
 
     test('at parent of moveOp.newPpath', () => {
       op1 = makeOp.moveNode([1, 0], [0, 0]);
-      op2 = makeOp.removeNode([0], doc.children[0]);
+      op2 = makeOp.removeNode([0], branch);
     });
 
     test('at parent of both moveOp.path&newPath', () => {
       op1 = makeOp.moveNode([0, 0], [0, 1]);
-      op2 = makeOp.removeNode([0], doc.children[0]);
+      op2 = makeOp.removeNode([0], branch);
     });
   });
 
@@ -131,32 +110,32 @@ describe('left side to moveNode, right side to:', () => {
   describe('mergeNode', () => {
     test('at moveOp.path', () => {
       op1 = makeOp.moveNode([1], [2]);
-      op2 = makeOp.mergeNode([1], 2);
+      op2 = makeOp.mergeNode([1], 3);
     });
 
     test('at moveOp.path.next', () => {
       op1 = makeOp.moveNode([1], [2]);
-      op2 = makeOp.mergeNode([2], 2);
+      op2 = makeOp.mergeNode([2], 3);
     });
 
     test('at moveOp.newPath', () => {
       op1 = makeOp.moveNode([2], [1]);
-      op2 = makeOp.mergeNode([1], 2);
+      op2 = makeOp.mergeNode([1], 3);
     });
 
     test('at moveOp.newPath.next', () => {
       op1 = makeOp.moveNode([0], [1]);
-      op2 = makeOp.mergeNode([2], 2);
+      op2 = makeOp.mergeNode([2], 3);
     });
 
     test('at parent of moveOp.newPath & uncle of moveOp.path', () => {
       op1 = makeOp.moveNode([0, 1], [1, 0]);
-      op2 = makeOp.mergeNode([1], 2);
+      op2 = makeOp.mergeNode([1], 3);
     });
 
     test('at parent of moveOp.path & uncle of moveOp.newPath', () => {
       op1 = makeOp.moveNode([1, 0], [0, 1]);
-      op2 = makeOp.mergeNode([1], 2);
+      op2 = makeOp.mergeNode([1], 3);
     });
   });
 
