@@ -9,6 +9,7 @@ import {
 
 import { xTransformMxN } from './SlateType';
 import { decomposeMove } from './transMoveNode';
+import { pathTransform } from './OT';
 
 export const transInsertNode = (
   leftOp: InsertNodeOperation,
@@ -20,28 +21,16 @@ export const transInsertNode = (
       if (Path.equals(leftOp.path, rightOp.path) && side === 'left') {
         return [leftOp];
       }
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
+
+      return <InsertNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'remove_node': {
-      // seems to be a bug in slate's Path.transform()
-      const path: Path | null = Path.equals(leftOp.path, rightOp.path)
-        ? leftOp.path
-        : Path.transform(leftOp.path, rightOp);
+      if (Path.equals(leftOp.path, rightOp.path)) {
+        return [leftOp];
+      }
 
-      return path
-        ? [
-            {
-              ...leftOp,
-              path,
-            },
-          ]
-        : [];
+      return <InsertNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'split_node': {
@@ -49,40 +38,30 @@ export const transInsertNode = (
         return [leftOp];
       }
 
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
+      return <InsertNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'merge_node': {
-      if (!Path.equals(leftOp.path, rightOp.path)) {
+      if (Path.equals(leftOp.path, rightOp.path)) {
+        const offset = Text.isText(leftOp.node)
+          ? leftOp.node.text.length
+          : leftOp.node.children.length;
         return [
           {
-            ...leftOp,
-            path: Path.transform(leftOp.path, rightOp)!,
+            ...rightOp,
+            type: 'split_node',
+            path: Path.previous(rightOp.path),
+          },
+          leftOp,
+          rightOp,
+          {
+            ...rightOp,
+            position: rightOp.position + offset,
           },
         ];
       }
 
-      const offset = Text.isText(leftOp.node)
-        ? leftOp.node.text.length
-        : leftOp.node.children.length;
-      return [
-        {
-          ...rightOp,
-          type: 'split_node',
-          path: Path.previous(rightOp.path),
-        },
-        leftOp,
-        rightOp,
-        {
-          ...rightOp,
-          position: rightOp.position + offset,
-        },
-      ];
+      return <InsertNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'move_node': {
@@ -120,6 +99,6 @@ export const transInsertNode = (
     // remove_text
     // set_node
     default:
-      return [leftOp];
+      return <InsertNodeOperation[]>pathTransform(leftOp, rightOp);
   }
 };

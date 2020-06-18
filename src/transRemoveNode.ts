@@ -7,6 +7,7 @@ import {
 
 import { xTransformMxN } from './SlateType';
 import { decomposeMove } from './transMoveNode';
+import { pathTransform } from './OT';
 
 export const transRemoveNode = (
   leftOp: RemoveNodeOperation,
@@ -14,42 +15,16 @@ export const transRemoveNode = (
   side: 'left' | 'right'
 ): (RemoveNodeOperation | SplitNodeOperation)[] => {
   switch (rightOp.type) {
-    case 'insert_node': {
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
-    }
-
-    case 'remove_node': {
-      const path: Path | null = Path.transform(leftOp.path, rightOp);
-      return path
-        ? [
-            {
-              ...leftOp,
-              path,
-            },
-          ]
-        : [];
-    }
-
     case 'split_node': {
-      if (!Path.equals(leftOp.path, rightOp.path)) {
-        return [
-          {
-            ...leftOp,
-            path: Path.transform(leftOp.path, rightOp)!,
-          },
-        ];
+      if (Path.equals(leftOp.path, rightOp.path)) {
+        // should remove the target node && the split node
+        //   however, after removing the target node,
+        //   the split node becomes the same path.
+        // TODO: node within op should be split.
+        return [leftOp, leftOp];
       }
 
-      // should remove the target node && the split node
-      //   however, after removing the target node,
-      //   the split node becomes the same path.
-      // TODO: node within op should be split.
-      return [leftOp, leftOp];
+      return <RemoveNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'merge_node': {
@@ -69,12 +44,7 @@ export const transRemoveNode = (
         ];
       }
 
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
+      return <RemoveNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'move_node': {
@@ -116,8 +86,10 @@ export const transRemoveNode = (
 
     // insert_text
     // remove_text
+    // insert_node
+    // remove_node
     // set_node
     default:
-      return [leftOp];
+      return <RemoveNodeOperation[]>pathTransform(leftOp, rightOp);
   }
 };
