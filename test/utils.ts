@@ -153,7 +153,7 @@ export const initialDoc: Element = {
     },
     {
       type: 'NumberedList',
-      children: [{ text: 'GH' }, { text: 'IJ' }, { text: 'KL' }],
+      children: [{ text: 'GH', bold: 'true' }, { text: 'IJ' }, { text: 'KL' }],
     },
     {
       type: 'BulletedList',

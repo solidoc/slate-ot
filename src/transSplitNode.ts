@@ -163,15 +163,8 @@ export const transSplitNode = (
           ];
         }
 
-        // conflicting ops, have to discard children merge first
-        return [
-          {
-            ...rightOp,
-            type: 'split_node',
-            path: Path.previous(rightOp.path),
-          },
-          leftOp,
-        ];
+        // conflicting ops, discard split
+        return [];
       }
 
       return [

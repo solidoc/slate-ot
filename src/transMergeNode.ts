@@ -149,9 +149,16 @@ export const transMergeNode = (
 
       const path = Path.transform(leftOp.path, rightOp)!;
 
-      // conflicting ops, we choose to discard merge
+      // conflicting ops, we choose to discard split
       if (path[path.length - 1] === 0) {
-        return [];
+        return [
+          {
+            ...rightOp,
+            type: 'merge_node',
+            path: Path.next(rightOp.path),
+          },
+          leftOp,
+        ];
       }
 
       return [
@@ -239,11 +246,8 @@ export const transMergeNode = (
       ];
     }
 
-    case 'set_node': {
-      return [leftOp];
-    }
-
+    // set_node
     default:
-      throw new Error('Unsupported OP');
+      return [leftOp];
   }
 };

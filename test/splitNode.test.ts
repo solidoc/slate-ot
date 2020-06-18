@@ -200,7 +200,7 @@ describe('left side to splitNode, right side to:', () => {
   });
 
   describe('setNode', () => {
-    test('to splitOp.path.child w. offset > position', () => {
+    test('', () => {
       op1 = makeOp.splitNode([1], 1);
       op2 = makeOp.setNode([1, 0], { bold: true });
     });
