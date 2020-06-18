@@ -21,13 +21,25 @@ describe('left side to insertText, right side to:', () => {
   });
 
   describe('insertText', () => {
+    test('before left insertion', () => {
+      op1 = makeOp.insertText([0, 0], 1, 'tt');
+      op2 = makeOp.insertText([0, 0], 0, 'ee');
+    });
+
+    test('same place as left insertion', () => {
+      op1 = makeOp.insertText([0, 0], 1, 'tt');
+      op2 = makeOp.insertText([0, 0], 1, 'ee');
+    });
+
     test('at some other path', () => {
       op1 = makeOp.insertText([0, 0], 1, 'tt');
       op2 = makeOp.insertText([0, 1], 1, 'ee');
     });
   });
 
-  describe('removeText', () => {});
+  describe('removeText', () => {
+    // covered by removeText + insertText
+  });
 
   describe('insertNode', () => {
     // trivial
@@ -37,9 +49,13 @@ describe('left side to insertText, right side to:', () => {
     // trivial
   });
 
-  describe('splitNode', () => {});
+  describe('splitNode', () => {
+    // covered by splitNode + insertText
+  });
 
-  describe('mergeNode', () => {});
+  describe('mergeNode', () => {
+    // covered by mergeNode + insertText
+  });
 
   describe('moveNode', () => {
     // trivial
