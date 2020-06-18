@@ -149,11 +149,11 @@ export const initialDoc: Element = {
   children: [
     {
       type: 'Paragraph',
-      children: [{ text: 'AB' }, { text: 'CD' }, { text: 'EF' }],
+      children: [{ text: 'AB', italic: true }, { text: 'CD' }, { text: 'EF' }],
     },
     {
       type: 'NumberedList',
-      children: [{ text: 'GH', bold: 'true' }, { text: 'IJ' }, { text: 'KL' }],
+      children: [{ text: 'GH', bold: true }, { text: 'IJ' }, { text: 'KL' }],
     },
     {
       type: 'BulletedList',
