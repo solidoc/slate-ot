@@ -1,6 +1,6 @@
 {
   "name": "slate-ot",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "transform between slate operations for collaboration",
   "main": "./dist/index.js",
   "type": "./dist/index.d.ts",
