@@ -157,7 +157,7 @@ export const initialDoc: Element = {
     },
     {
       type: 'BulletedList',
-      children: [{ text: 'MN' }, { text: 'OP' }, { text: 'QR' }],
+      children: [{ text: 'MN' }, { text: 'OPQ' }, { text: 'RST' }],
     },
   ],
 };

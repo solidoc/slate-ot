@@ -1,4 +1,5 @@
 import { RemoveTextOperation, Operation, Path } from 'slate';
+import { pathTransform } from './OT';
 
 export const transRemoveText = (
   leftOp: RemoveTextOperation,
@@ -68,27 +69,6 @@ export const transRemoveText = (
       ];
     }
 
-    case 'insert_node': {
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
-    }
-
-    case 'remove_node': {
-      const path: Path | null = Path.transform(leftOp.path, rightOp);
-      return path
-        ? [
-            {
-              ...leftOp,
-              path,
-            },
-          ]
-        : [];
-    }
-
     case 'split_node': {
       if (!Path.equals(leftOp.path, rightOp.path)) {
         return [
@@ -149,20 +129,11 @@ export const transRemoveText = (
       ];
     }
 
-    case 'move_node': {
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
-    }
-
-    case 'set_node': {
-      return [leftOp];
-    }
-
+    // insert_node
+    // remove_node
+    // move_node
+    // set_node
     default:
-      throw new Error('Unsupported OP');
+      return <RemoveTextOperation[]>pathTransform(leftOp, rightOp);
   }
 };
