@@ -6,6 +6,7 @@ import {
   MoveNodeOperation,
   RemoveNodeOperation,
 } from 'slate';
+import { pathTransform } from './OT';
 
 export const transMergeNode = (
   leftOp: MergeNodeOperation,
@@ -63,12 +64,7 @@ export const transMergeNode = (
         ];
       }
 
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
+      return <MergeNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'remove_node': {
@@ -161,12 +157,7 @@ export const transMergeNode = (
         ];
       }
 
-      return [
-        {
-          ...leftOp,
-          path,
-        },
-      ];
+      return <MergeNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'merge_node': {
@@ -193,12 +184,7 @@ export const transMergeNode = (
         ];
       }
 
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
+      return <MergeNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'move_node': {
@@ -213,7 +199,7 @@ export const transMergeNode = (
       const newPrevPath = Path.transform(prevPath, rightOp)!;
 
       // Ops conflict with each other, discard merge.
-      //  Note that the merge-and-split node cannot keep properties,
+      //   Note that the merge-and-split node cannot keep properties,
       //   so we have to remove it.
       if (!Path.equals(newPath, Path.next(newPrevPath))) {
         return [
@@ -248,6 +234,6 @@ export const transMergeNode = (
 
     // set_node
     default:
-      return [leftOp];
+      return <MergeNodeOperation[]>pathTransform(leftOp, rightOp);
   }
 };

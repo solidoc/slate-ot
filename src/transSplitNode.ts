@@ -1,4 +1,5 @@
 import { SplitNodeOperation, Operation, Path } from 'slate';
+import { pathTransform } from './OT';
 
 export const transSplitNode = (
   leftOp: SplitNodeOperation,
@@ -65,12 +66,7 @@ export const transSplitNode = (
         ];
       }
 
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
+      return <SplitNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'remove_node': {
@@ -89,15 +85,7 @@ export const transSplitNode = (
         ];
       }
 
-      const path: Path | null = Path.transform(leftOp.path, rightOp);
-      return path
-        ? [
-            {
-              ...leftOp,
-              path,
-            },
-          ]
-        : [];
+      return <SplitNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'split_node': {
@@ -134,12 +122,7 @@ export const transSplitNode = (
         ];
       }
 
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
+      return <SplitNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'merge_node': {
@@ -167,12 +150,7 @@ export const transSplitNode = (
         return [];
       }
 
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
+      return <SplitNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'move_node': {
@@ -211,6 +189,6 @@ export const transSplitNode = (
 
     // set_node
     default:
-      return [leftOp];
+      return <SplitNodeOperation[]>pathTransform(leftOp, rightOp);
   }
 };
