@@ -6,14 +6,6 @@ export const transSetNode = (
   side: 'left' | 'right'
 ): SetNodeOperation[] => {
   switch (rightOp.type) {
-    case 'insert_text': {
-      return [leftOp];
-    }
-
-    case 'remove_text': {
-      return [leftOp];
-    }
-
     case 'insert_node': {
       return [
         {
@@ -104,6 +96,6 @@ export const transSetNode = (
     }
 
     default:
-      throw new Error('Unsupported OP');
+      return [leftOp];
   }
 };

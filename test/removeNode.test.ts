@@ -131,7 +131,7 @@ describe('left side to removeNode, right side to:', () => {
 
   describe('setNode', () => {
     test('', () => {
-      op1 = makeOp.removeNode([1], branch);
+      op1 = makeOp.removeNode([2], branch);
       op2 = makeOp.setNode([1, 0], { bold: true });
     });
   });
