@@ -1,4 +1,5 @@
 import { SetNodeOperation, Operation, Path } from 'slate';
+import { pathTransform } from './OT';
 
 export const transSetNode = (
   leftOp: SetNodeOperation,
@@ -6,45 +7,18 @@ export const transSetNode = (
   side: 'left' | 'right'
 ): SetNodeOperation[] => {
   switch (rightOp.type) {
-    case 'insert_node': {
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
-    }
-
-    case 'remove_node': {
-      const path = Path.transform(leftOp.path, rightOp);
-
-      return path
-        ? [
-            {
-              ...leftOp,
-              path,
-            },
-          ]
-        : [];
-    }
-
     case 'split_node': {
-      if (!Path.equals(leftOp.path, rightOp.path)) {
+      if (Path.equals(leftOp.path, rightOp.path)) {
         return [
+          leftOp,
           {
             ...leftOp,
-            path: Path.transform(leftOp.path, rightOp)!,
+            path: Path.next(leftOp.path),
           },
         ];
       }
 
-      return [
-        leftOp,
-        {
-          ...leftOp,
-          path: Path.next(leftOp.path),
-        },
-      ];
+      return <SetNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'merge_node': {
@@ -52,21 +26,7 @@ export const transSetNode = (
         return [];
       }
 
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
-    }
-
-    case 'move_node': {
-      return [
-        {
-          ...leftOp,
-          path: Path.transform(leftOp.path, rightOp)!,
-        },
-      ];
+      return <SetNodeOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'set_node': {
@@ -95,7 +55,12 @@ export const transSetNode = (
           ];
     }
 
+    // insert_text
+    // remove_text
+    // insert_node
+    // remove_node
+    // move_node
     default:
-      return [leftOp];
+      return <SetNodeOperation[]>pathTransform(leftOp, rightOp);
   }
 };

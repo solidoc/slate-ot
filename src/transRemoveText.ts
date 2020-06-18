@@ -70,63 +70,53 @@ export const transRemoveText = (
     }
 
     case 'split_node': {
-      if (!Path.equals(leftOp.path, rightOp.path)) {
+      if (Path.equals(leftOp.path, rightOp.path)) {
+        // text to remove all within the former segment
+        if (leftOp.offset + leftOp.text.length <= rightOp.position) {
+          return [leftOp];
+        }
+
+        // text to remove all within the latter segment
+        if (leftOp.offset >= rightOp.position) {
+          return [
+            {
+              ...leftOp,
+              path: Path.next(rightOp.path),
+              offset: leftOp.offset - rightOp.position,
+            },
+          ];
+        }
+
+        // text to remove in both segments
         return [
           {
             ...leftOp,
-            path: Path.transform(leftOp.path, rightOp)!,
+            text: leftOp.text.slice(0, rightOp.position - leftOp.offset),
           },
-        ];
-      }
-
-      // text to remove all within the former segment
-      if (leftOp.offset + leftOp.text.length <= rightOp.position) {
-        return [leftOp];
-      }
-
-      // text to remove all within the latter segment
-      if (leftOp.offset >= rightOp.position) {
-        return [
           {
             ...leftOp,
             path: Path.next(rightOp.path),
-            offset: leftOp.offset - rightOp.position,
+            offset: 0,
+            text: leftOp.text.slice(rightOp.position - leftOp.offset),
           },
         ];
       }
 
-      // text to remove in both segments
-      return [
-        {
-          ...leftOp,
-          text: leftOp.text.slice(0, rightOp.position - leftOp.offset),
-        },
-        {
-          ...leftOp,
-          path: Path.next(rightOp.path),
-          offset: 0,
-          text: leftOp.text.slice(rightOp.position - leftOp.offset),
-        },
-      ];
+      return <RemoveTextOperation[]>pathTransform(leftOp, rightOp);
     }
 
     case 'merge_node': {
-      if (!Path.equals(leftOp.path, rightOp.path)) {
+      if (Path.equals(leftOp.path, rightOp.path)) {
         return [
           {
             ...leftOp,
-            path: Path.transform(leftOp.path, rightOp)!,
+            path: Path.previous(rightOp.path),
+            offset: leftOp.offset + rightOp.position,
           },
         ];
       }
 
-      return [
-        {
-          ...leftOp,
-          path: Path.previous(rightOp.path),
-          offset: leftOp.offset + rightOp.position,
-        },
-      ];
+      return <RemoveTextOperation[]>pathTransform(leftOp, rightOp);
     }
 
     // insert_node
