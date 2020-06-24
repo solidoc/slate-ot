@@ -14,7 +14,23 @@ const slateType = {
 
   apply(snapshot: Editor, op: Operation[] | Operation) {
     slateType.normalize(op).forEach((o) => {
-      Transforms.transform(snapshot, o);
+      if (o.type === 'set_node' && o.path.length === 0) {
+        for (const key in o.newProperties) {
+          if (key === 'id' || key === 'type' || key === 'children') {
+            throw new Error(`Cannot set the "${key}" property of nodes!`);
+          }
+
+          const value = o.newProperties[key];
+
+          if (value == null) {
+            delete snapshot[key];
+          } else {
+            snapshot[key] = value;
+          }
+        }
+      } else {
+        Transforms.transform(snapshot, o);
+      }
     });
     return snapshot;
   },
